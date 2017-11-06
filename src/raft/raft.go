@@ -18,7 +18,10 @@ package raft
 //
 
 import "sync"
-import "labrpc"
+import (
+	"labrpc"
+	"log"
+)
 
 // import "bytes"
 // import "encoding/gob"
@@ -155,6 +158,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	term := -1
 	isLeader := true
 
+	log.Printf("Raft[%d] starts", rf.me)
 
 	return index, term, isLeader
 }
@@ -167,6 +171,8 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 //
 func (rf *Raft) Kill() {
 	// Your code here, if desired.
+
+	log.Printf("Kill raft[%d]", rf.me)
 }
 
 //
@@ -186,6 +192,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.peers = peers
 	rf.persister = persister
 	rf.me = me
+
+	log.Printf("Make Raft[%d]", rf.me)
 
 	// Your initialization code here.
 
