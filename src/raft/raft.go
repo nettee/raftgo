@@ -270,6 +270,22 @@ func Make(peers []*labrpc.ClientEnd, me int,
 }
 
 func run(rf *Raft) {
+
+	for {
+		switch rf.role {
+		case Follower:
+			runAsFollower(rf)
+		case Candidate:
+			runAsCandidate(rf)
+		case Leader:
+			runAsLeader(rf)
+		default:
+			log.Fatalf("Invalid rf.role %v", rf.role)
+		}
+	}
+}
+
+func runAsFollower(rf *Raft) {
 	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
 	// Election timeout: 500~800 ms
 	electionTimeout := 500 + rand.Intn(300)
@@ -279,6 +295,7 @@ func run(rf *Raft) {
 
 	if rf.votedFor != -1 {
 		log.Printf("[%d] already voted for [%d], quit", rf.me, rf.votedFor)
+		roleTransition(rf, Follower)
 		return
 	}
 
@@ -288,8 +305,12 @@ func run(rf *Raft) {
 	// (S5.2-P2) To begin an run, a follower increments its current Term
 	// and transitions to candidate state.
 	rf.currentTerm++
-	rf.role = Candidate
-	log.Printf("[%d] ->%s, term = %d", rf.me, rf.role, rf.currentTerm)
+	log.Printf("[%d] increase term = %d", rf.me, rf.currentTerm)
+	roleTransition(rf, Candidate)
+	return
+}
+
+func runAsCandidate(rf *Raft) {
 
 	voteCount := 0
 	maxCount := len(rf.peers)
@@ -315,9 +336,17 @@ func run(rf *Raft) {
 	log.Printf("[%d] collects %d/%d votes, majority = %v", rf.me, voteCount, maxCount, majority)
 
 	if majority {
-		lastRole := rf.role
-		rf.role = Leader
-		log.Printf("[%d] %s->%s", rf.me, lastRole, rf.role)
+		roleTransition(rf, Leader)
+		return
 	}
+}
 
+func runAsLeader(rf *Raft) {
+	//
+}
+
+func roleTransition(rf *Raft, newRole Role) {
+	oldRole := rf.role
+	rf.role = newRole
+	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
 }
