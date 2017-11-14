@@ -26,6 +26,26 @@ import (
 // import "bytes"
 // import "encoding/gob"
 
+type Role int
+
+const (
+	Follower Role = iota
+	Candidate
+	Leader
+)
+
+func (role Role) String() string {
+	switch role {
+	case Follower:
+		return "Follower"
+	case Candidate:
+		return "Candidate"
+	case Leader:
+		return "Leader"
+	default:
+		return "UnknownRole"
+	}
+}
 
 
 //
@@ -52,6 +72,7 @@ type Raft struct {
 	// Your data here.
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
+	role      Role
 
 }
 
@@ -59,10 +80,10 @@ type Raft struct {
 // believes it is the leader.
 func (rf *Raft) GetState() (int, bool) {
 
-	var term int
-	var isleader bool
 	// Your code here.
-	return term, isleader
+	var term int
+	isLeader := rf.role == Leader
+	return term, isLeader
 }
 
 //
@@ -158,8 +179,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	term := -1
 	isLeader := true
 
-	log.Printf("Raft[%d] starts", rf.me)
-
 	return index, term, isLeader
 }
 
@@ -172,7 +191,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 func (rf *Raft) Kill() {
 	// Your code here, if desired.
 
-	log.Printf("Kill raft[%d]", rf.me)
+	log.Printf("Kill Raft[%d]", rf.me)
 }
 
 //
@@ -188,6 +207,7 @@ func (rf *Raft) Kill() {
 //
 func Make(peers []*labrpc.ClientEnd, me int,
 	persister *Persister, applyCh chan ApplyMsg) *Raft {
+
 	rf := &Raft{}
 	rf.peers = peers
 	rf.persister = persister
@@ -196,6 +216,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	log.Printf("Make Raft[%d]", rf.me)
 
 	// Your initialization code here.
+	rf.role = Follower
+	log.Printf("Raft[%d] init role as %s", rf.me, rf.role)
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
