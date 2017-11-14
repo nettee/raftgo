@@ -21,6 +21,8 @@ import "sync"
 import (
 	"labrpc"
 	"log"
+	"math/rand"
+	"time"
 )
 
 // import "bytes"
@@ -72,17 +74,20 @@ type Raft struct {
 	// Your data here.
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
-	role      Role
-
+	role Role
+	currentTerm int // latest Term server has seen
+	votedFor int // CandidateId that received vote in current Term (or -1 if none)
 }
 
 // return currentTerm and whether this server
 // believes it is the leader.
 func (rf *Raft) GetState() (int, bool) {
 
-	// Your code here.
 	var term int
-	isLeader := rf.role == Leader
+	var isLeader bool
+	// Your code here.
+	term = rf.currentTerm
+	isLeader = rf.role == Leader
 	return term, isLeader
 }
 
@@ -122,6 +127,8 @@ func (rf *Raft) readPersist(data []byte) {
 //
 type RequestVoteArgs struct {
 	// Your data here.
+	Term        int // candidate's Term
+	CandidateId int
 }
 
 //
@@ -129,6 +136,8 @@ type RequestVoteArgs struct {
 //
 type RequestVoteReply struct {
 	// Your data here.
+	Term int // currentTerm, for candidate to update itself
+	VoteGranted bool // true means candidate received vote
 }
 
 //
@@ -136,6 +145,34 @@ type RequestVoteReply struct {
 //
 func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here.
+
+	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
+	// it updates its current term to the larger value.
+	if rf.currentTerm < args.Term {
+		rf.currentTerm = args.Term
+		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.CandidateId)
+		rf.votedFor = args.CandidateId
+		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
+		reply.Term = rf.currentTerm
+		reply.VoteGranted = true
+
+	// If a server receives a request with a stale term number,
+	// it rejects the request.
+	} else if rf.currentTerm > args.Term {
+		log.Printf("[%d] rejected [%d]", rf.me, args.CandidateId)
+		reply.Term = rf.currentTerm
+		reply.VoteGranted = false
+
+	} else if rf.votedFor == -1 {
+		rf.votedFor = args.CandidateId
+		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
+		reply.Term = rf.currentTerm
+		reply.VoteGranted = true
+	} else {
+		log.Printf("[%d] already voted another server", rf.me)
+		reply.Term = rf.currentTerm
+		reply.VoteGranted = false
+	}
 }
 
 //
@@ -213,15 +250,74 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.persister = persister
 	rf.me = me
 
-	log.Printf("Make Raft[%d]", rf.me)
-
 	// Your initialization code here.
+
+	// (Figure2-State) initialized to 0 on first boot
+	rf.currentTerm = 0
+
+	rf.votedFor = -1
+
+	// (S5.2-P1) When servers start up, they begin as followers.
 	rf.role = Follower
-	log.Printf("Raft[%d] init role as %s", rf.me, rf.role)
+	log.Printf("[%d] :%s", rf.me, rf.role)
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
 
+	go run(rf)
 
 	return rf
+}
+
+func run(rf *Raft) {
+	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
+	// Election timeout: 500~800 ms
+	electionTimeout := 500 + rand.Intn(300)
+	log.Printf("[%d]'s election timeout = %d ms", rf.me, electionTimeout)
+	time.Sleep(time.Duration(electionTimeout) * time.Millisecond)
+	log.Printf("[%d] is election timeout", rf.me)
+
+	if rf.votedFor != -1 {
+		log.Printf("[%d] already voted for [%d], quit", rf.me, rf.votedFor)
+		return
+	}
+
+	// (S5.2-P1) If a follower receives no communication over run timeout,
+	// then is begins an run to choose a new leader.
+
+	// (S5.2-P2) To begin an run, a follower increments its current Term
+	// and transitions to candidate state.
+	rf.currentTerm++
+	rf.role = Candidate
+	log.Printf("[%d] ->%s, term = %d", rf.me, rf.role, rf.currentTerm)
+
+	voteCount := 0
+	maxCount := len(rf.peers)
+
+	rf.votedFor = rf.me // Vote for itself
+	voteCount++
+
+	for serverId := 0; serverId < maxCount; serverId++ {
+		if serverId == rf.me {
+			continue
+		}
+		args := RequestVoteArgs{Term: rf.currentTerm, CandidateId: rf.me}
+		reply := RequestVoteReply{}
+		log.Printf("[%d]->[%d] SEND RequestVote RPC, term = %d", rf.me, serverId, rf.currentTerm)
+		rf.sendRequestVote(serverId, args, &reply)
+		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, serverId, reply.VoteGranted)
+		if reply.VoteGranted {
+			voteCount++
+		}
+	}
+
+	majority := voteCount > maxCount / 2
+	log.Printf("[%d] collects %d/%d votes, majority = %v", rf.me, voteCount, maxCount, majority)
+
+	if majority {
+		lastRole := rf.role
+		rf.role = Leader
+		log.Printf("[%d] %s->%s", rf.me, lastRole, rf.role)
+	}
+
 }
