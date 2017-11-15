@@ -289,13 +289,6 @@ func run(rf *Raft) {
 	}
 }
 
-func electionTimeout(rf *Raft) time.Duration {
-	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
-	// Election timeout: 500~800ms
-	timeout := 500 + rand.Intn(300)
-	log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
-	return time.Duration(timeout) * time.Millisecond
-}
 
 func runAsFollower(rf *Raft) {
 
@@ -303,17 +296,19 @@ func runAsFollower(rf *Raft) {
 	// If election timeout elapses without receiving AppendEntries RPC from
 	// current leader or granting vote to candidate: convert to candidate.
 
-	t := time.NewTimer(electionTimeout(rf))
-	<- t.C
-	log.Printf("[%d] election timeout expired", rf.me)
+	timeout := time.After(rf.electionTimeout())
 
-	// (S5.2-P1) If a follower receives no communication over election timeout,
-	// then is begins an election to choose a new leader.
-	// (S5.2-P2) To begin an election, a follower increments its current term
-	// and transitions to candidate state.
-	if rf.votedFor == -1 {
-		rf.roleTransition(Candidate)
-		return
+	select {
+	case <- timeout:
+		log.Printf("[%d] election timeout expired", rf.me)
+		// (S5.2-P1) If a follower receives no communication over election timeout,
+		// then is begins an election to choose a new leader.
+		// (S5.2-P2) To begin an election, a follower increments its current term
+		// and transitions to candidate state.
+		if rf.votedFor == -1 {
+			rf.roleTransition(Candidate)
+			return
+		}
 	}
 
 	rf.roleTransition(Follower)
@@ -336,7 +331,7 @@ func runAsCandidate(rf *Raft) {
 	rf.votes = 1
 
 	// 3. Reset election timer
-	timeout := time.After(electionTimeout(rf))
+	timeout := time.After(rf.electionTimeout())
 
 	// 4. Send RequestVote RPCs to all other servers
 	for serverId := 0; serverId < len(rf.peers); serverId++ {
@@ -377,6 +372,14 @@ func runAsCandidate(rf *Raft) {
 
 func runAsLeader(rf *Raft) {
 	//
+}
+
+func (rf *Raft) electionTimeout() time.Duration {
+	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
+	// Election timeout: 500~800ms
+	timeout := 500 + rand.Intn(300)
+	log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
+	return time.Duration(timeout) * time.Millisecond
 }
 
 func (rf *Raft) increaseTerm() {
