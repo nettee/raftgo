@@ -199,6 +199,24 @@ func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *Request
 	return ok
 }
 
+type AppendEntriesArgs struct {
+	Term int // leader's term
+	LeaderId int
+}
+
+type AppendEntriesReply struct {
+	Term int // currentTerm, for leader to update itself
+}
+
+func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
+	reply.Term = rf.currentTerm
+}
+
+func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
+	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
+	return ok
+}
+
 
 //
 // the service using Raft (e.g. a k/v server) wants to start
@@ -371,7 +389,23 @@ func runAsCandidate(rf *Raft) {
 }
 
 func runAsLeader(rf *Raft) {
-	//
+	// Repeat sending initial empty AppendEntries RPCs (heartbeat) to each server
+	for serverId := 0; serverId < len(rf.peers); serverId++ {
+		if serverId == rf.me {
+			continue
+		}
+		go func(i int) {
+			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
+			reply := AppendEntriesReply{}
+			log.Printf("[%d]->[%d] SEND heartbeat", rf.me, i)
+			rf.sendAppendEntries(i, args, &reply)
+			log.Printf("[%d]<-[%d] RECEIVE heartbeat", rf.me, i)
+		} (serverId)
+	}
+
+	for 1 < 2 {
+
+	}
 }
 
 func (rf *Raft) electionTimeout() time.Duration {
@@ -380,6 +414,10 @@ func (rf *Raft) electionTimeout() time.Duration {
 	timeout := 500 + rand.Intn(300)
 	log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
 	return time.Duration(timeout) * time.Millisecond
+}
+
+func (rf *Raft) heartbeatTimeout() time.Duration {
+	return time.Duration(150) * time.Millisecond
 }
 
 func (rf *Raft) increaseTerm() {
