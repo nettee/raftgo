@@ -76,7 +76,9 @@ type Raft struct {
 	// state a Raft server must maintain.
 	role Role
 	currentTerm int // latest Term server has seen
-	votedFor int // CandidateId that received vote in current Term (or -1 if none)
+	votedFor int // CandidateId that received vote in current term (or -1 if none)
+	votes int // Number of votes received, only for Candidate
+	winsElection chan bool // Signals that the candidate wins an election
 }
 
 // return currentTerm and whether this server
@@ -261,6 +263,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.role = Follower
 	log.Printf("[%d] :%s", rf.me, rf.role)
 
+	rf.winsElection = make(chan bool, len(rf.peers)) // The buffer size should be large enough
+
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
 
@@ -285,58 +289,88 @@ func run(rf *Raft) {
 	}
 }
 
-func runAsFollower(rf *Raft) {
+func electionTimeout(rf *Raft) time.Duration {
 	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
-	// Election timeout: 500~800 ms
-	electionTimeout := 500 + rand.Intn(300)
-	log.Printf("[%d]'s election timeout = %d ms", rf.me, electionTimeout)
-	time.Sleep(time.Duration(electionTimeout) * time.Millisecond)
-	log.Printf("[%d] is election timeout", rf.me)
+	// Election timeout: 500~800ms
+	timeout := 500 + rand.Intn(300)
+	log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
+	return time.Duration(timeout) * time.Millisecond
+}
 
-	if rf.votedFor != -1 {
-		log.Printf("[%d] already voted for [%d], quit", rf.me, rf.votedFor)
-		roleTransition(rf, Follower)
+func runAsFollower(rf *Raft) {
+
+	// (Figure2) Followers:
+	// If election timeout elapses without receiving AppendEntries RPC from
+	// current leader or granting vote to candidate: convert to candidate.
+
+	t := time.NewTimer(electionTimeout(rf))
+	<- t.C
+	log.Printf("[%d] election timeout expired", rf.me)
+
+	// (S5.2-P1) If a follower receives no communication over election timeout,
+	// then is begins an election to choose a new leader.
+	// (S5.2-P2) To begin an election, a follower increments its current term
+	// and transitions to candidate state.
+	if rf.votedFor == -1 {
+		rf.roleTransition(Candidate)
 		return
 	}
 
-	// (S5.2-P1) If a follower receives no communication over run timeout,
-	// then is begins an run to choose a new leader.
-
-	// (S5.2-P2) To begin an run, a follower increments its current Term
-	// and transitions to candidate state.
-	rf.currentTerm++
-	log.Printf("[%d] increase term = %d", rf.me, rf.currentTerm)
-	roleTransition(rf, Candidate)
-	return
+	rf.roleTransition(Follower)
 }
 
 func runAsCandidate(rf *Raft) {
 
-	voteCount := 0
-	maxCount := len(rf.peers)
+	// (Figure2) Candidates:
+	// * On conversion to candidate, start election:
+	//   1. Increment currentTerm
+	//   2. Vote for self
+	//   3. Reset election timer
+	//   4. Send RequestVote RPCs to all other servers
 
-	rf.votedFor = rf.me // Vote for itself
-	voteCount++
+	// 1. Increment the current term
+	rf.increaseTerm()
 
-	for serverId := 0; serverId < maxCount; serverId++ {
+	// 2. Vote for itself
+	rf.votedFor = rf.me
+	rf.votes = 1
+
+	// 3. Reset election timer
+	timeout := time.After(electionTimeout(rf))
+
+	// 4. Send RequestVote RPCs to all other servers
+	for serverId := 0; serverId < len(rf.peers); serverId++ {
 		if serverId == rf.me {
 			continue
 		}
-		args := RequestVoteArgs{Term: rf.currentTerm, CandidateId: rf.me}
-		reply := RequestVoteReply{}
-		log.Printf("[%d]->[%d] SEND RequestVote RPC, term = %d", rf.me, serverId, rf.currentTerm)
-		rf.sendRequestVote(serverId, args, &reply)
-		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, serverId, reply.VoteGranted)
-		if reply.VoteGranted {
-			voteCount++
-		}
+		go func(i int) {
+			args := RequestVoteArgs{Term: rf.currentTerm, CandidateId: rf.me}
+			reply := RequestVoteReply{}
+			log.Printf("[%d]->[%d] SEND RequestVote RPC, term = %d", rf.me, i, rf.currentTerm)
+			rf.sendRequestVote(i, args, &reply)
+			log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, i, reply.VoteGranted)
+			if reply.VoteGranted {
+				rf.mu.Lock()
+				rf.votes++
+				if rf.votes > len(rf.peers)/2 {
+					// This candidate has received votes from majority of servers
+					// Send signal that it wins an election
+					rf.winsElection <- true
+				}
+				rf.mu.Unlock()
+			}
+		} (serverId)
 	}
 
-	majority := voteCount > maxCount / 2
-	log.Printf("[%d] collects %d/%d votes, majority = %v", rf.me, voteCount, maxCount, majority)
-
-	if majority {
-		roleTransition(rf, Leader)
+	select {
+	case <- timeout:
+		log.Printf("[%d] election timeout elapse", rf.me)
+		// Start new election
+		rf.roleTransition(Candidate)
+		return
+	case <- rf.winsElection:
+		log.Printf("[%d] wins an election", rf.me)
+		rf.roleTransition(Leader)
 		return
 	}
 }
@@ -345,7 +379,13 @@ func runAsLeader(rf *Raft) {
 	//
 }
 
-func roleTransition(rf *Raft, newRole Role) {
+func (rf *Raft) increaseTerm() {
+	oldTerm := rf.currentTerm
+	rf.currentTerm++
+	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
+}
+
+func (rf *Raft) roleTransition(newRole Role) {
 	oldRole := rf.role
 	rf.role = newRole
 	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
