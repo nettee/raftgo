@@ -79,6 +79,7 @@ type Raft struct {
 	votedFor int // CandidateId that received vote in current term (or -1 if none)
 	votes int // Number of votes received, only for Candidate
 	winsElection chan bool // Signals that the candidate wins an election
+	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
 }
 
 // return currentTerm and whether this server
@@ -210,6 +211,7 @@ type AppendEntriesReply struct {
 
 func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
 	reply.Term = rf.currentTerm
+	rf.receivedHeartbeat <- true
 }
 
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
@@ -282,6 +284,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	log.Printf("[%d] :%s", rf.me, rf.role)
 
 	rf.winsElection = make(chan bool, len(rf.peers)) // The buffer size should be large enough
+	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
@@ -317,8 +320,10 @@ func runAsFollower(rf *Raft) {
 	timeout := time.After(rf.electionTimeout())
 
 	select {
+	case <- rf.receivedHeartbeat:
+		log.Printf("Follower [%d] received heartbeat, remains follower", rf.me)
 	case <- timeout:
-		log.Printf("[%d] election timeout expired", rf.me)
+		log.Printf("Follower [%d] election timeout expired", rf.me)
 		// (S5.2-P1) If a follower receives no communication over election timeout,
 		// then is begins an election to choose a new leader.
 		// (S5.2-P2) To begin an election, a follower increments its current term
@@ -328,8 +333,6 @@ func runAsFollower(rf *Raft) {
 			return
 		}
 	}
-
-	rf.roleTransition(Follower)
 }
 
 func runAsCandidate(rf *Raft) {
@@ -377,18 +380,21 @@ func runAsCandidate(rf *Raft) {
 
 	select {
 	case <- timeout:
-		log.Printf("[%d] election timeout elapse", rf.me)
+		log.Printf("Candidate [%d] election timeout elapse", rf.me)
 		// Start new election
 		rf.roleTransition(Candidate)
 		return
 	case <- rf.winsElection:
-		log.Printf("[%d] wins an election", rf.me)
+		log.Printf("Candidate [%d] wins an election", rf.me)
 		rf.roleTransition(Leader)
 		return
 	}
 }
 
 func runAsLeader(rf *Raft) {
+
+	timeout := time.After(rf.heartbeatTimeout())
+
 	// Repeat sending initial empty AppendEntries RPCs (heartbeat) to each server
 	for serverId := 0; serverId < len(rf.peers); serverId++ {
 		if serverId == rf.me {
@@ -397,14 +403,14 @@ func runAsLeader(rf *Raft) {
 		go func(i int) {
 			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
 			reply := AppendEntriesReply{}
-			log.Printf("[%d]->[%d] SEND heartbeat", rf.me, i)
 			rf.sendAppendEntries(i, args, &reply)
-			log.Printf("[%d]<-[%d] RECEIVE heartbeat", rf.me, i)
+			log.Printf("[%d]<-[%d] SENDED heartbeat", rf.me, i)
 		} (serverId)
 	}
 
-	for 1 < 2 {
-
+	select {
+	case <- timeout:
+		// continue
 	}
 }
 
@@ -412,7 +418,7 @@ func (rf *Raft) electionTimeout() time.Duration {
 	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
 	// Election timeout: 500~800ms
 	timeout := 500 + rand.Intn(300)
-	log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
+	//log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
 	return time.Duration(timeout) * time.Millisecond
 }
 
