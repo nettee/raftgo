@@ -77,9 +77,12 @@ type Raft struct {
 	role Role
 	currentTerm int // latest Term server has seen
 	votedFor int // CandidateId that received vote in current term (or -1 if none)
+
 	votes int // Number of votes received, only for Candidate
 	winsElection chan bool // Signals that the candidate wins an election
+
 	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
+	grantingVote chan bool // Signals that the follower is granting votes to candidate
 }
 
 // return currentTerm and whether this server
@@ -175,6 +178,10 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 		log.Printf("[%d] already voted another server", rf.me)
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = false
+	}
+
+	if reply.VoteGranted {
+		rf.grantingVote <- true
 	}
 }
 
@@ -283,27 +290,29 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.role = Follower
 	log.Printf("[%d] :%s", rf.me, rf.role)
 
-	rf.winsElection = make(chan bool, len(rf.peers)) // The buffer size should be large enough
 	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
+	rf.grantingVote = make(chan bool, len(rf.peers))
+
+	rf.winsElection = make(chan bool, len(rf.peers)) // The buffer size should be large enough
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
 
-	go run(rf)
+	go rf.run()
 
 	return rf
 }
 
-func run(rf *Raft) {
+func (rf *Raft) run() {
 
 	for {
 		switch rf.role {
 		case Follower:
-			runAsFollower(rf)
+			rf.runAsFollower()
 		case Candidate:
-			runAsCandidate(rf)
+			rf.runAsCandidate()
 		case Leader:
-			runAsLeader(rf)
+			rf.runAsLeader()
 		default:
 			log.Fatalf("Invalid rf.role %v", rf.role)
 		}
@@ -311,7 +320,7 @@ func run(rf *Raft) {
 }
 
 
-func runAsFollower(rf *Raft) {
+func (rf *Raft) runAsFollower() {
 
 	// (Figure2) Followers:
 	// If election timeout elapses without receiving AppendEntries RPC from
@@ -322,23 +331,23 @@ func runAsFollower(rf *Raft) {
 	select {
 	case <- rf.receivedHeartbeat:
 		log.Printf("Follower [%d] received heartbeat, remains follower", rf.me)
+	case <- rf.grantingVote:
+		log.Printf("Follower [%d] is granting vote, remains follower", rf.me)
 	case <- timeout:
 		log.Printf("Follower [%d] election timeout expired", rf.me)
 		// (S5.2-P1) If a follower receives no communication over election timeout,
 		// then is begins an election to choose a new leader.
 		// (S5.2-P2) To begin an election, a follower increments its current term
 		// and transitions to candidate state.
-		if rf.votedFor == -1 {
-			rf.roleTransition(Candidate)
-			return
-		}
+		rf.roleTransition(Candidate)
+		return
 	}
 }
 
-func runAsCandidate(rf *Raft) {
+func (rf *Raft) runAsCandidate() {
 
 	// (Figure2) Candidates:
-	// * On conversion to candidate, start election:
+	// On conversion to candidate, start election:
 	//   1. Increment currentTerm
 	//   2. Vote for self
 	//   3. Reset election timer
@@ -378,20 +387,27 @@ func runAsCandidate(rf *Raft) {
 		} (serverId)
 	}
 
+	// If votes received from majority of servers: become leader
+	// If AppendEntries RPC received from new leader: convert to follower
+	// If election timeout elapses: start new election
 	select {
+	case <- rf.winsElection:
+		log.Printf("Candidate [%d] wins an election", rf.me)
+		rf.roleTransition(Leader)
+		return
+	case <- rf.receivedHeartbeat:
+		log.Printf("Candidate [%d] received heartbeat from new leader", rf.me)
+		rf.roleTransition(Follower)
+		return
 	case <- timeout:
 		log.Printf("Candidate [%d] election timeout elapse", rf.me)
 		// Start new election
 		rf.roleTransition(Candidate)
 		return
-	case <- rf.winsElection:
-		log.Printf("Candidate [%d] wins an election", rf.me)
-		rf.roleTransition(Leader)
-		return
 	}
 }
 
-func runAsLeader(rf *Raft) {
+func (rf *Raft) runAsLeader() {
 
 	timeout := time.After(rf.heartbeatTimeout())
 
@@ -404,7 +420,7 @@ func runAsLeader(rf *Raft) {
 			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
 			reply := AppendEntriesReply{}
 			rf.sendAppendEntries(i, args, &reply)
-			log.Printf("[%d]<-[%d] SENDED heartbeat", rf.me, i)
+			log.Printf("[%d]->[%d] SENDED heartbeat", rf.me, i)
 		} (serverId)
 	}
 
