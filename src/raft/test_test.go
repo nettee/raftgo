@@ -13,7 +13,9 @@ import "fmt"
 import "time"
 import "math/rand"
 import "sync/atomic"
-import "sync"
+import (
+	"sync"
+)
 
 // The tester generously allows solutions to complete elections in one second
 // (much more than the paper's range of timeouts).
@@ -41,6 +43,7 @@ func TestInitialElection(t *testing.T) {
 }
 
 func TestReElection(t *testing.T) {
+
 	servers := 3
 	cfg := make_config(t, servers, false)
 	defer cfg.cleanup()

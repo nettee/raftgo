@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+    echo "Usage: runtest KEYWORD MAX"
+    exit 1
+fi
+
+max=$2
+for i in `seq 1 $max`; do
+    echo "running $i/$max"
+    go test -run $1 > "out.$(echo $1 | tr '[:upper:]' '[:lower:]').$i" 2>&1
+done
+

@@ -34,6 +34,7 @@ const (
 	Follower Role = iota
 	Candidate
 	Leader
+	Dead
 )
 
 func (role Role) String() string {
@@ -44,6 +45,8 @@ func (role Role) String() string {
 		return "Candidate"
 	case Leader:
 		return "Leader"
+	case Dead:
+		return "Dead"
 	default:
 		return "UnknownRole"
 	}
@@ -78,11 +81,14 @@ type Raft struct {
 	currentTerm int // latest Term server has seen
 	votedFor int // CandidateId that received vote in current term (or -1 if none)
 
-	votes int // Number of votes received, only for Candidate
-	winsElection chan bool // Signals that the candidate wins an election
+	votes         int       // Number of votes received, only for Candidate
+	majorityVotes chan bool // Signals that the candidate receives majority votes
+	winsElection bool
 
 	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
 	grantingVote chan bool // Signals that the follower is granting votes to candidate
+
+	dead chan bool
 }
 
 // return currentTerm and whether this server
@@ -274,7 +280,9 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 func (rf *Raft) Kill() {
 	// Your code here, if desired.
 
-	log.Printf("Kill Raft[%d]", rf.me)
+	log.Printf("Kill [%d]", rf.me)
+	rf.role = Dead
+	rf.dead <- true
 }
 
 //
@@ -305,12 +313,15 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// (S5.2-P1) When servers start up, they begin as followers.
 	rf.role = Follower
-	log.Printf("[%d] :%s", rf.me, rf.role)
+	log.Printf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
 
 	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
 	rf.grantingVote = make(chan bool, len(rf.peers))
 
-	rf.winsElection = make(chan bool, len(rf.peers)) // The buffer size should be large enough
+	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
+	rf.winsElection = false
+
+	rf.dead = make(chan bool, len(rf.peers))
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
@@ -330,6 +341,8 @@ func (rf *Raft) run() {
 			rf.runAsCandidate()
 		case Leader:
 			rf.runAsLeader()
+		case Dead:
+			// do nothing
 		default:
 			log.Fatalf("Invalid rf.role %v", rf.role)
 		}
@@ -345,6 +358,10 @@ func (rf *Raft) runAsFollower() {
 
 	timeout := time.After(rf.electionTimeout())
 
+	if rf.role != Follower {
+		return
+	}
+
 	select {
 	case <- rf.receivedHeartbeat:
 		log.Printf("Follower [%d] received heartbeat, remains follower", rf.me)
@@ -357,6 +374,8 @@ func (rf *Raft) runAsFollower() {
 		// (S5.2-P2) To begin an election, a follower increments its current term
 		// and transitions to candidate state.
 		rf.roleTransition(Candidate)
+		return
+	case <- rf.dead:
 		return
 	}
 }
@@ -397,11 +416,16 @@ func (rf *Raft) runAsCandidate() {
 				if rf.role == Candidate && rf.votes > len(rf.peers)/2 {
 					// This candidate has received votes from majority of servers
 					// Send signal that it wins an election
-					rf.winsElection <- true
+					rf.winsElection = true
+					rf.majorityVotes <- true
 				}
 				rf.mu.Unlock()
 			}
 		} (serverId)
+	}
+
+	if rf.role != Candidate {
+		return
 	}
 
 	// (Figure2) Candidates:
@@ -410,7 +434,7 @@ func (rf *Raft) runAsCandidate() {
 	// If election timeout elapses: start new election
 
 	select {
-	case <- rf.winsElection:
+	case <- rf.majorityVotes:
 		log.Printf("Candidate [%d] wins an election", rf.me)
 		rf.roleTransition(Leader)
 		return
@@ -422,6 +446,8 @@ func (rf *Raft) runAsCandidate() {
 		log.Printf("Candidate [%d] election timeout elapses", rf.me)
 		// Start new election
 		rf.roleTransition(Candidate)
+		return
+	case <- rf.dead:
 		return
 	}
 }
@@ -443,11 +469,17 @@ func (rf *Raft) runAsLeader() {
 		} (serverId)
 	}
 
+	if rf.role != Leader {
+		return
+	}
+
 	select {
 	case <- rf.receivedHeartbeat:
 		log.Printf("Leader [%d] received heartbeat from new leader", rf.me)
 		rf.roleTransition(Follower)
 	case <- timeout:
+		return
+	case <- rf.dead:
 		return
 	}
 }
