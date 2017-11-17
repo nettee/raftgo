@@ -152,6 +152,8 @@ type RequestVoteReply struct {
 func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here.
 
+	var voteGranted bool
+
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
@@ -159,30 +161,29 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.CandidateId)
 		rf.votedFor = args.CandidateId
 		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
-		reply.Term = rf.currentTerm
-		reply.VoteGranted = true
+		voteGranted = true
 
 	// If a server receives a request with a stale term number,
 	// it rejects the request.
 	} else if rf.currentTerm > args.Term {
 		log.Printf("[%d] rejected [%d]", rf.me, args.CandidateId)
-		reply.Term = rf.currentTerm
-		reply.VoteGranted = false
+		voteGranted = false
 
 	} else if rf.votedFor == -1 {
 		rf.votedFor = args.CandidateId
 		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
-		reply.Term = rf.currentTerm
-		reply.VoteGranted = true
+		voteGranted = true
 	} else {
 		log.Printf("[%d] already voted another server", rf.me)
-		reply.Term = rf.currentTerm
-		reply.VoteGranted = false
+		voteGranted = false
 	}
 
-	if reply.VoteGranted {
+	if voteGranted {
 		rf.grantingVote <- true
 	}
+
+	reply.Term = rf.currentTerm
+	reply.VoteGranted = voteGranted
 }
 
 //
@@ -217,8 +218,24 @@ type AppendEntriesReply struct {
 }
 
 func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
+
+	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
+	// it updates its current term to the larger value.
+	if rf.currentTerm < args.Term {
+		rf.currentTerm = args.Term
+		rf.receivedHeartbeat <- true
+		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
+
+	// If a server receives a request with a stale term number,
+	// it rejects the request.
+	} else if rf.currentTerm > args.Term {
+		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
+
+	} else {
+		rf.receivedHeartbeat <- true
+	}
+
 	reply.Term = rf.currentTerm
-	rf.receivedHeartbeat <- true
 }
 
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
@@ -377,7 +394,7 @@ func (rf *Raft) runAsCandidate() {
 			if reply.VoteGranted {
 				rf.mu.Lock()
 				rf.votes++
-				if rf.votes > len(rf.peers)/2 {
+				if rf.role == Candidate && rf.votes > len(rf.peers)/2 {
 					// This candidate has received votes from majority of servers
 					// Send signal that it wins an election
 					rf.winsElection <- true
@@ -387,9 +404,11 @@ func (rf *Raft) runAsCandidate() {
 		} (serverId)
 	}
 
+	// (Figure2) Candidates:
 	// If votes received from majority of servers: become leader
-	// If AppendEntries RPC received from new leader: convert to follower
+	// If AppendEntries RPC (heartbeat) received from new leader: convert to follower
 	// If election timeout elapses: start new election
+
 	select {
 	case <- rf.winsElection:
 		log.Printf("Candidate [%d] wins an election", rf.me)
@@ -400,7 +419,7 @@ func (rf *Raft) runAsCandidate() {
 		rf.roleTransition(Follower)
 		return
 	case <- timeout:
-		log.Printf("Candidate [%d] election timeout elapse", rf.me)
+		log.Printf("Candidate [%d] election timeout elapses", rf.me)
 		// Start new election
 		rf.roleTransition(Candidate)
 		return
@@ -411,7 +430,7 @@ func (rf *Raft) runAsLeader() {
 
 	timeout := time.After(rf.heartbeatTimeout())
 
-	// Repeat sending initial empty AppendEntries RPCs (heartbeat) to each server
+	// Repeat sending initial empty AppendEntries RPCs (heartbeats) to each server
 	for serverId := 0; serverId < len(rf.peers); serverId++ {
 		if serverId == rf.me {
 			continue
@@ -419,14 +438,17 @@ func (rf *Raft) runAsLeader() {
 		go func(i int) {
 			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
 			reply := AppendEntriesReply{}
+			log.Printf("[%d]->[%d] SEND heartbeat", rf.me, i)
 			rf.sendAppendEntries(i, args, &reply)
-			log.Printf("[%d]->[%d] SENDED heartbeat", rf.me, i)
 		} (serverId)
 	}
 
 	select {
+	case <- rf.receivedHeartbeat:
+		log.Printf("Leader [%d] received heartbeat from new leader", rf.me)
+		rf.roleTransition(Follower)
 	case <- timeout:
-		// continue
+		return
 	}
 }
 
