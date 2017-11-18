@@ -210,7 +210,11 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 // the struct itself.
 //
 func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *RequestVoteReply) bool {
+	log.Printf("[%d]->[%d] SEND RequestVote RPC, term = %d", rf.me, server, rf.currentTerm)
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
+	if ok {
+		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, server, reply.VoteGranted)
+	}
 	return ok
 }
 
@@ -245,7 +249,11 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 }
 
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
+	log.Printf("[%d]->[%d] SEND heartbeat", rf.me, server)
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
+	if ok {
+		log.Printf("[%d]<-[%d] RECEIVE heartbeat reply", rf.me, server)
+	}
 	return ok
 }
 
@@ -407,11 +415,9 @@ func (rf *Raft) runAsCandidate() {
 		go func(i int) {
 			args := RequestVoteArgs{Term: rf.currentTerm, CandidateId: rf.me}
 			reply := RequestVoteReply{}
-			log.Printf("[%d]->[%d] SEND RequestVote RPC, term = %d", rf.me, i, rf.currentTerm)
 			rf.sendRequestVote(i, args, &reply)
-			log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, i, reply.VoteGranted)
 			if reply.VoteGranted {
-				rf.mu.Lock()
+				//rf.mu.Lock()
 				rf.votes++
 				if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
 					// This candidate has received votes from majority of servers
@@ -419,7 +425,7 @@ func (rf *Raft) runAsCandidate() {
 					rf.winsElection = true
 					rf.majorityVotes <- true
 				}
-				rf.mu.Unlock()
+				//rf.mu.Unlock()
 			}
 		} (serverId)
 	}
@@ -464,7 +470,6 @@ func (rf *Raft) runAsLeader() {
 		go func(i int) {
 			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
 			reply := AppendEntriesReply{}
-			log.Printf("[%d]->[%d] SEND heartbeat", rf.me, i)
 			rf.sendAppendEntries(i, args, &reply)
 		} (serverId)
 	}
