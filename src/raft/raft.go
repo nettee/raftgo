@@ -413,7 +413,7 @@ func (rf *Raft) runAsCandidate() {
 			if reply.VoteGranted {
 				rf.mu.Lock()
 				rf.votes++
-				if rf.role == Candidate && rf.votes > len(rf.peers)/2 {
+				if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
 					// This candidate has received votes from majority of servers
 					// Send signal that it wins an election
 					rf.winsElection = true
