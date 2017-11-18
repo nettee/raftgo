@@ -506,4 +506,8 @@ func (rf *Raft) roleTransition(newRole Role) {
 	oldRole := rf.role
 	rf.role = newRole
 	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
+
+	if oldRole == Candidate {
+		rf.winsElection = false // Reset variable
+	}
 }
