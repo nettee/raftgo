@@ -158,6 +158,9 @@ type RequestVoteReply struct {
 func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here.
 
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
 	var voteGranted bool
 
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
@@ -228,6 +231,9 @@ type AppendEntriesReply struct {
 }
 
 func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
 
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
 	// it updates its current term to the larger value.
@@ -417,7 +423,7 @@ func (rf *Raft) runAsCandidate() {
 			reply := RequestVoteReply{}
 			rf.sendRequestVote(i, args, &reply)
 			if reply.VoteGranted {
-				//rf.mu.Lock()
+				rf.mu.Lock()
 				rf.votes++
 				if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
 					// This candidate has received votes from majority of servers
@@ -425,7 +431,7 @@ func (rf *Raft) runAsCandidate() {
 					rf.winsElection = true
 					rf.majorityVotes <- true
 				}
-				//rf.mu.Unlock()
+				rf.mu.Unlock()
 			}
 		} (serverId)
 	}
