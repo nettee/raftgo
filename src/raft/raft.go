@@ -159,7 +159,7 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here.
 
 	rf.mu.Lock()
-	rf.mu.Unlock()
+	defer rf.mu.Unlock()
 
 	var voteGranted bool
 
@@ -429,7 +429,7 @@ func (rf *Raft) runAsCandidate() {
 			reply := RequestVoteReply{}
 			rf.sendRequestVote(i, args, &reply)
 			if reply.VoteGranted {
-				//rf.mu.Lock()
+				rf.mu.Lock()
 				rf.votes++
 				if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
 					// This candidate has received votes from majority of servers
@@ -437,7 +437,7 @@ func (rf *Raft) runAsCandidate() {
 					rf.winsElection = true
 					rf.majorityVotes <- true
 				}
-				//rf.mu.Unlock()
+				rf.mu.Unlock()
 			}
 		} (serverId)
 	}
