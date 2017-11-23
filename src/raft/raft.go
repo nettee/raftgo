@@ -158,6 +158,9 @@ type RequestVoteReply struct {
 func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here.
 
+	rf.mu.Lock()
+	rf.mu.Unlock()
+
 	var voteGranted bool
 
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
@@ -229,6 +232,9 @@ type AppendEntriesReply struct {
 
 func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
 
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
@@ -287,6 +293,9 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 //
 func (rf *Raft) Kill() {
 	// Your code here, if desired.
+
+	rf.mu.Lock()
+	rf.mu.Unlock()
 
 	log.Printf("Kill [%d]", rf.me)
 	rf.role = Dead
@@ -390,6 +399,9 @@ func (rf *Raft) runAsFollower() {
 
 func (rf *Raft) runAsCandidate() {
 
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
 	// (Figure2) Candidates:
 	// On conversion to candidate, start election:
 	//   1. Increment currentTerm
@@ -460,6 +472,9 @@ func (rf *Raft) runAsCandidate() {
 
 func (rf *Raft) runAsLeader() {
 
+	rf.mu.Lock()
+	rf.mu.Unlock()
+
 	timeout := time.After(rf.heartbeatTimeout())
 
 	// Repeat sending initial empty AppendEntries RPCs (heartbeats) to each server
@@ -502,12 +517,20 @@ func (rf *Raft) heartbeatTimeout() time.Duration {
 }
 
 func (rf *Raft) increaseTerm() {
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
 	oldTerm := rf.currentTerm
 	rf.currentTerm++
 	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
 }
 
 func (rf *Raft) roleTransition(newRole Role) {
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
 	oldRole := rf.role
 	rf.role = newRole
 	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
