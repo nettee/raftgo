@@ -396,9 +396,6 @@ func (rf *Raft) runAsFollower() {
 
 func (rf *Raft) runAsCandidate() {
 
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
-
 	// (Figure2) Candidates:
 	// On conversion to candidate, start election:
 	//   1. Increment currentTerm
