@@ -65,6 +65,12 @@ type ApplyMsg struct {
 	Snapshot    []byte // ignore for lab2; only used in lab3
 }
 
+type LogEntry struct {
+	Index int // The position of this entry in log
+	Term int // The term of leader when the command is received
+	Command interface{} // The command from client
+}
+
 //
 // A Go object implementing a single Raft peer.
 //
@@ -77,9 +83,11 @@ type Raft struct {
 	// Your data here.
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
-	role Role
+	role Role // Follower, Candidate or Leader
+
 	currentTerm int // latest Term server has seen
 	votedFor int // CandidateId that received vote in current term (or -1 if none)
+	log []LogEntry // Log entries (first index is 1)
 
 	votes         int       // Number of votes received, only for Candidate
 	majorityVotes chan bool // Signals that the candidate receives majority votes
@@ -263,106 +271,35 @@ func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *App
 	return ok
 }
 
-
-//
-// the service using Raft (e.g. a k/v server) wants to start
-// agreement on the next command to be appended to Raft's log. if this
-// server isn't the leader, returns false. otherwise start the
-// agreement and return immediately. there is no guarantee that this
-// command will ever be committed to the Raft log, since the leader
-// may fail or lose an election.
-//
-// the first return value is the index that the command will appear at
-// if it's ever committed. the second return value is the current
-// term. the third return value is true if this server believes it is
-// the leader.
-//
-func (rf *Raft) Start(command interface{}) (int, int, bool) {
-	index := -1
-	term := -1
-	isLeader := true
-
-	return index, term, isLeader
+func (rf *Raft) electionTimeout() time.Duration {
+	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
+	// Election timeout: 500~800ms
+	timeout := 500 + rand.Intn(300)
+	//log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
+	return time.Duration(timeout) * time.Millisecond
 }
 
-//
-// the tester calls Kill() when a Raft instance won't
-// be needed again. you are not required to do anything
-// in Kill(), but it might be convenient to (for example)
-// turn off debug output from this instance.
-//
-func (rf *Raft) Kill() {
-	// Your code here, if desired.
-
-	log.Printf("Kill [%d]", rf.me)
-	rf.role = Dead
-	rf.dead <- true
+func (rf *Raft) heartbeatTimeout() time.Duration {
+	return time.Duration(150) * time.Millisecond
 }
 
-//
-// the service or tester wants to create a Raft server. the ports
-// of all the Raft servers (including this one) are in peers[]. this
-// server's port is peers[me]. all the servers' peers[] arrays
-// have the same order. persister is a place for this server to
-// save its persistent state, and also initially holds the most
-// recent saved state, if any. applyCh is a channel on which the
-// tester or service expects Raft to send ApplyMsg messages.
-// Make() must return quickly, so it should start goroutines
-// for any long-running work.
-//
-func Make(peers []*labrpc.ClientEnd, me int,
-	persister *Persister, applyCh chan ApplyMsg) *Raft {
+func (rf *Raft) increaseTerm() {
 
-	rf := &Raft{}
-	rf.peers = peers
-	rf.persister = persister
-	rf.me = me
-
-	// Your initialization code here.
-
-	// (Figure2-State) initialized to 0 on first boot
-	rf.currentTerm = 0
-
-	rf.votedFor = -1
-
-	// (S5.2-P1) When servers start up, they begin as followers.
-	rf.role = Follower
-	log.Printf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
-
-	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
-	rf.grantingVote = make(chan bool, len(rf.peers))
-
-	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
-	rf.winsElection = false
-
-	rf.dead = make(chan bool, len(rf.peers))
-
-	// initialize from state persisted before a crash
-	rf.readPersist(persister.ReadRaftState())
-
-	go rf.run()
-
-	return rf
+	oldTerm := rf.currentTerm
+	rf.currentTerm++
+	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
 }
 
-func (rf *Raft) run() {
+func (rf *Raft) roleTransition(newRole Role) {
 
-	for {
-		switch rf.role {
-		case Follower:
-			rf.runAsFollower()
-		case Candidate:
-			rf.runAsCandidate()
-		case Leader:
-			rf.runAsLeader()
-		case Dead:
-			// do nothing
-		default:
-			log.Fatalf("Invalid rf.role %v", rf.role)
-		}
+	oldRole := rf.role
+	rf.role = newRole
+	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
+
+	if oldRole == Candidate {
+		rf.winsElection = false // Reset variable
 	}
 }
-
 
 func (rf *Raft) runAsFollower() {
 
@@ -498,32 +435,118 @@ func (rf *Raft) runAsLeader() {
 	}
 }
 
-func (rf *Raft) electionTimeout() time.Duration {
-	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
-	// Election timeout: 500~800ms
-	timeout := 500 + rand.Intn(300)
-	//log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
-	return time.Duration(timeout) * time.Millisecond
-}
+func (rf *Raft) run() {
 
-func (rf *Raft) heartbeatTimeout() time.Duration {
-	return time.Duration(150) * time.Millisecond
-}
-
-func (rf *Raft) increaseTerm() {
-
-	oldTerm := rf.currentTerm
-	rf.currentTerm++
-	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
-}
-
-func (rf *Raft) roleTransition(newRole Role) {
-
-	oldRole := rf.role
-	rf.role = newRole
-	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
-
-	if oldRole == Candidate {
-		rf.winsElection = false // Reset variable
+	for {
+		switch rf.role {
+		case Follower:
+			rf.runAsFollower()
+		case Candidate:
+			rf.runAsCandidate()
+		case Leader:
+			rf.runAsLeader()
+		case Dead:
+			// do nothing
+		default:
+			log.Fatalf("Invalid rf.role %v", rf.role)
+		}
 	}
+}
+
+//
+// the service or tester wants to create a Raft server. the ports
+// of all the Raft servers (including this one) are in peers[]. this
+// server's port is peers[me]. all the servers' peers[] arrays
+// have the same order. persister is a place for this server to
+// save its persistent state, and also initially holds the most
+// recent saved state, if any. applyCh is a channel on which the
+// tester or service expects Raft to send ApplyMsg messages.
+// Make() must return quickly, so it should start goroutines
+// for any long-running work.
+//
+func Make(peers []*labrpc.ClientEnd, me int,
+	persister *Persister, applyCh chan ApplyMsg) *Raft {
+
+	rf := &Raft{}
+	rf.peers = peers
+	rf.persister = persister
+	rf.me = me
+
+	// Your initialization code here.
+
+	// (Figure2-State) initialized to 0 on first boot
+	rf.currentTerm = 0
+
+	rf.votedFor = -1
+
+	// (S5.2-P1) When servers start up, they begin as followers.
+	rf.role = Follower
+	log.Printf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
+
+	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
+	rf.grantingVote = make(chan bool, len(rf.peers))
+
+	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
+	rf.winsElection = false
+
+	rf.dead = make(chan bool, len(rf.peers))
+
+	// initialize from state persisted before a crash
+	rf.readPersist(persister.ReadRaftState())
+
+	go rf.run()
+
+	return rf
+}
+
+//
+// the service using Raft (e.g. a k/v server) wants to start
+// agreement on the next command to be appended to Raft's log. if this
+// server isn't the leader, returns false. otherwise start the
+// agreement and return immediately. there is no guarantee that this
+// command will ever be committed to the Raft log, since the leader
+// may fail or lose an election.
+//
+// the first return value is the index that the command will appear at
+// if it's ever committed. the second return value is the current
+// term. the third return value is true if this server believes it is
+// the leader.
+//
+func (rf *Raft) Start(command interface{}) (int, int, bool) {
+	index := -1
+	term := -1
+	isLeader := true
+
+	term = rf.currentTerm
+	isLeader = rf.role == Leader
+
+	if isLeader {
+
+		// (Figure2) Leaders:
+		// If command received from client: append entry to log,
+		// respond after entry applied to state machine.
+
+		log.Printf("COMMAND {%d} received from client", command)
+
+		logEntry := LogEntry{Index: 0, Term: rf.currentTerm, Command: command}
+		log.Printf("new log entry: index = %d", logEntry.Index)
+
+		// TODO assign index
+	}
+
+	return index, term, isLeader
+}
+
+//
+// the tester calls Kill() when a Raft instance won't
+// be needed again. you are not required to do anything
+// in Kill(), but it might be convenient to (for example)
+// turn off debug output from this instance.
+//
+func (rf *Raft) Kill() {
+	// Your code here, if desired.
+
+	log.Printf("Kill [%d]", rf.me)
+	rf.role = Dead
+	rf.dead <- true
 }
