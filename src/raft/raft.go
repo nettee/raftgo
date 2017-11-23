@@ -294,9 +294,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 func (rf *Raft) Kill() {
 	// Your code here, if desired.
 
-	rf.mu.Lock()
-	rf.mu.Unlock()
-
 	log.Printf("Kill [%d]", rf.me)
 	rf.role = Dead
 	rf.dead <- true
@@ -518,18 +515,12 @@ func (rf *Raft) heartbeatTimeout() time.Duration {
 
 func (rf *Raft) increaseTerm() {
 
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
-
 	oldTerm := rf.currentTerm
 	rf.currentTerm++
 	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
 }
 
 func (rf *Raft) roleTransition(newRole Role) {
-
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
 
 	oldRole := rf.role
 	rf.role = newRole
