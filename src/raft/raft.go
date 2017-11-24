@@ -263,12 +263,17 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 }
 
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
-	log.Printf("[%d]->[%d] SEND heartbeat", rf.me, server)
+	log.Printf("[%d]->[%d] SEND heartbeat, term = %d", rf.me, server, args.Term)
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	if ok {
 		log.Printf("[%d]<-[%d] RECEIVE heartbeat reply", rf.me, server)
 	}
 	return ok
+}
+
+func (rf *Raft) getLastLog() LogEntry {
+	i := len(rf.log) - 1
+	return rf.log[i]
 }
 
 func (rf *Raft) electionTimeout() time.Duration {
@@ -477,7 +482,12 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	// (Figure2-State) initialized to 0 on first boot
 	rf.currentTerm = 0
 
+	// Vote for nobody
 	rf.votedFor = -1
+
+	// Add a dummy log entry to ensure the index of real log entries start from 1
+	rf.log = append(rf.log, LogEntry{Index: 0, Term: 0, Command: nil})
+
 
 	// (S5.2-P1) When servers start up, they begin as followers.
 	rf.role = Follower
@@ -528,10 +538,12 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 
 		log.Printf("COMMAND {%d} received from client", command)
 
-		logEntry := LogEntry{Index: 0, Term: rf.currentTerm, Command: command}
-		log.Printf("new log entry: index = %d", logEntry.Index)
+		index = rf.getLastLog().Index + 1
 
-		// TODO assign index
+		logEntry := LogEntry{Index: index, Term: rf.currentTerm, Command: command}
+		rf.log = append(rf.log, logEntry)
+
+		log.Printf("append new log entry: index = %d", logEntry.Index)
 	}
 
 	return index, term, isLeader
