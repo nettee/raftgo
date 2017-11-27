@@ -23,6 +23,7 @@ import (
 	"log"
 	"math/rand"
 	"time"
+	"fmt"
 )
 
 // import "bytes"
@@ -71,6 +72,10 @@ type LogEntry struct {
 	Command interface{} // The command from client
 }
 
+func (le *LogEntry) String() string {
+	return fmt.Sprintf("<%d,%d,%v>", le.Index, le.Term, le.Command)
+}
+
 //
 // A Go object implementing a single Raft peer.
 //
@@ -83,20 +88,25 @@ type Raft struct {
 	// Your data here.
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
-	role Role // Follower, Candidate or Leader
 
+	role Role // Follower, Candidate or Leader
+	dead chan bool
+
+	// Persistent states on all servers:
 	currentTerm int // latest Term server has seen
 	votedFor int // CandidateId that received vote in current term (or -1 if none)
 	log []LogEntry // Log entries (first index is 1)
 
+	// Volatile states during leader election
 	votes         int       // Number of votes received, only for Candidate
 	majorityVotes chan bool // Signals that the candidate receives majority votes
 	winsElection bool
-
 	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
 	grantingVote chan bool // Signals that the follower is granting votes to candidate
 
-	dead chan bool
+	// Volatile states on leaders
+	nextIndex []int // nextIndex[i] - index of the next log entry to send to server[i]
+
 }
 
 // return currentTerm and whether this server
@@ -160,6 +170,19 @@ type RequestVoteReply struct {
 	VoteGranted bool // true means candidate received vote
 }
 
+type AppendEntriesArgs struct {
+	Term int // Leader's term
+	LeaderId int // Leader's ID
+	PrevLogIndex int // Index of log entry immediately preceding new ones
+	PrevLogTerm int // Term of PrevLogIndex entry
+	Entries []LogEntry // Log entries to store (empty for heartbeat)
+	LeaderCommit int // Leader's commitIndex
+}
+
+type AppendEntriesReply struct {
+	Term int // currentTerm, for leader to update itself
+}
+
 //
 // example RequestVote RPC handler.
 //
@@ -180,8 +203,8 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
 		voteGranted = true
 
-	// If a server receives a request with a stale term number,
-	// it rejects the request.
+		// If a server receives a request with a stale term number,
+		// it rejects the request.
 	} else if rf.currentTerm > args.Term {
 		log.Printf("[%d] rejected [%d]", rf.me, args.CandidateId)
 		voteGranted = false
@@ -201,6 +224,30 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 
 	reply.Term = rf.currentTerm
 	reply.VoteGranted = voteGranted
+}
+
+func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
+	// it updates its current term to the larger value.
+	if rf.currentTerm < args.Term {
+		rf.currentTerm = args.Term
+		rf.receivedHeartbeat <- true
+		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
+
+	// If a server receives a request with a stale term number,
+	// it rejects the request.
+	} else if rf.currentTerm > args.Term {
+		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
+
+	} else {
+		rf.receivedHeartbeat <- true
+	}
+
+	reply.Term = rf.currentTerm
 }
 
 //
@@ -229,51 +276,31 @@ func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *Request
 	return ok
 }
 
-type AppendEntriesArgs struct {
-	Term int // leader's term
-	LeaderId int
-}
-
-type AppendEntriesReply struct {
-	Term int // currentTerm, for leader to update itself
-}
-
-func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
-
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
-
-	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
-	// it updates its current term to the larger value.
-	if rf.currentTerm < args.Term {
-		rf.currentTerm = args.Term
-		rf.receivedHeartbeat <- true
-		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
-
-	// If a server receives a request with a stale term number,
-	// it rejects the request.
-	} else if rf.currentTerm > args.Term {
-		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
-
-	} else {
-		rf.receivedHeartbeat <- true
-	}
-
-	reply.Term = rf.currentTerm
-}
-
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
-	log.Printf("[%d]->[%d] SEND heartbeat, term = %d", rf.me, server, args.Term)
+	if args.Entries == nil || len(args.Entries) == 0 {
+		log.Printf("[%d]->[%d] SEND heartbeat, term = %d", rf.me, server, args.Term)
+	} else {
+		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLogIndex = %d, prevLogTerm = %d, len(entries) = %d",
+			rf.me, server, args.PrevLogIndex, args.PrevLogTerm, len(args.Entries))
+	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	if ok {
-		log.Printf("[%d]<-[%d] RECEIVE heartbeat reply", rf.me, server)
+		//log.Printf("[%d]<-[%d] RECEIVE heartbeat reply", rf.me, server)
 	}
 	return ok
 }
 
-func (rf *Raft) getLastLog() LogEntry {
+func (rf *Raft) getLastLogEntry() LogEntry {
 	i := len(rf.log) - 1
 	return rf.log[i]
+}
+
+func (rf *Raft) getLogEntry(logIndex int) LogEntry {
+	return rf.log[logIndex]
+}
+
+func (rf *Raft) getLogEntriesToSend(nextIndex int) []LogEntry {
+	return rf.log[nextIndex:]
 }
 
 func (rf *Raft) electionTimeout() time.Duration {
@@ -391,6 +418,11 @@ func (rf *Raft) runAsCandidate() {
 	case <- rf.majorityVotes:
 		log.Printf("Candidate [%d] wins an election", rf.me)
 		rf.roleTransition(Leader)
+		// Initialize states for leaders
+		rf.nextIndex = make([]int, len(rf.peers))
+		for i := range rf.peers {
+			rf.nextIndex[i] = rf.getLastLogEntry().Index + 1
+		}
 		return
 	case <- rf.receivedHeartbeat:
 		log.Printf("Candidate [%d] received heartbeat from new leader", rf.me)
@@ -420,6 +452,11 @@ func (rf *Raft) runAsLeader() {
 		}
 		go func(i int) {
 			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
+			args.PrevLogIndex = rf.nextIndex[i] - 1
+			args.PrevLogTerm = rf.getLogEntry(args.PrevLogIndex).Term
+			args.Entries = make([]LogEntry, rf.getLastLogEntry().Index - args.PrevLogIndex)
+			copy(args.Entries, rf.getLogEntriesToSend(rf.nextIndex[i]))
+
 			reply := AppendEntriesReply{}
 			rf.sendAppendEntries(i, args, &reply)
 		} (serverId)
@@ -492,14 +529,12 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	// (S5.2-P1) When servers start up, they begin as followers.
 	rf.role = Follower
 	log.Printf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
+	rf.dead = make(chan bool, len(rf.peers))
 
 	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
 	rf.grantingVote = make(chan bool, len(rf.peers))
-
 	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
 	rf.winsElection = false
-
-	rf.dead = make(chan bool, len(rf.peers))
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
@@ -536,14 +571,14 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		// If command received from client: append entry to log,
 		// respond after entry applied to state machine.
 
-		log.Printf("COMMAND {%d} received from client", command)
+		log.Printf("COMMAND received from client: {%d}", command)
 
-		index = rf.getLastLog().Index + 1
+		index = rf.getLastLogEntry().Index + 1
 
 		logEntry := LogEntry{Index: index, Term: rf.currentTerm, Command: command}
 		rf.log = append(rf.log, logEntry)
 
-		log.Printf("append new log entry: index = %d", logEntry.Index)
+		log.Printf("append new log entry: %s", logEntry.String())
 	}
 
 	return index, term, isLeader
