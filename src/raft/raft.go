@@ -181,6 +181,8 @@ type AppendEntriesArgs struct {
 
 type AppendEntriesReply struct {
 	Term int // currentTerm, for leader to update itself
+	Success bool // true if follower contained entry matching prevLogIndex and prevLogTerm
+	NextIndex int
 }
 
 //
@@ -231,23 +233,35 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
+	// If a server receives a request with a stale term number,
+	// it rejects the request.
+	if rf.currentTerm > args.Term {
+		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
+		reply.Term = rf.currentTerm
+		return
+	}
+
+	// Note: currentTerm will be modified later.
+	reply.Term = rf.currentTerm
+
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		rf.receivedHeartbeat <- true
 		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
-
-	// If a server receives a request with a stale term number,
-	// it rejects the request.
-	} else if rf.currentTerm > args.Term {
-		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
-
-	} else {
-		rf.receivedHeartbeat <- true
 	}
 
-	reply.Term = rf.currentTerm
+	rf.receivedHeartbeat <- true
+
+	// TODO when args.PrevLogIndex > rf.getLastLogEntry().Index
+
+	// TODO check log term matching
+
+	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
+	rf.log = append(rf.log, args.Entries...) // `...' means appending all entries
+	log.Printf("[%d] append its log, len(log) = %d", rf.me, len(rf.log))
+	reply.Success = true
+	reply.NextIndex = rf.getLastLogEntry().Index + 1
 }
 
 //
