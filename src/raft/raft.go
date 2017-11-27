@@ -291,7 +291,8 @@ func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *Request
 }
 
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
-	if args.Entries == nil || len(args.Entries) == 0 {
+	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
+	if isEmptyHeartbeat {
 		log.Printf("[%d]->[%d] SEND heartbeat, term = %d", rf.me, server, args.Term)
 	} else {
 		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLogIndex = %d, prevLogTerm = %d, len(entries) = %d",
@@ -299,7 +300,9 @@ func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *App
 	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	if ok {
-		//log.Printf("[%d]<-[%d] RECEIVE heartbeat reply", rf.me, server)
+		if !isEmptyHeartbeat {
+			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, server, reply.Success)
+		}
 	}
 	return ok
 }
