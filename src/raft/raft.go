@@ -113,6 +113,9 @@ type Raft struct {
 	winsElection bool
 	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
 	grantingVote chan bool // Signals that the follower is granting votes to candidate
+
+	// Volatile states during log replication
+	committable chan bool // Signals that the server can commit new logs
 }
 
 // return currentTerm and whether this server
@@ -383,6 +386,7 @@ func (rf *Raft) checkCommittable() {
 		log.Printf("[%d] check committable after (I.%d): logs until (I.%d) is committable",
 			rf.me, rf.commitIndex, committableIndex)
 		rf.commitIndex = committableIndex
+		rf.committable <- true
 	} else {
 		log.Printf("[%d] check committable after (I.%d): no more logs committable",
 			rf.me, rf.commitIndex)
@@ -591,6 +595,22 @@ func (rf *Raft) run() {
 	}
 }
 
+func (rf *Raft) waitForCommit() {
+	for {
+		select {
+		case <- rf.committable:
+			rf.mu.Lock()
+			for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
+				le := rf.log[i]
+				log.Printf("[%d] COMMIT %s", rf.me, le.String())
+				rf.applyCh <- ApplyMsg{Index: le.Index, Command: le.Command}
+				rf.lastApplied = i
+			}
+			rf.mu.Unlock()
+		}
+	}
+}
+
 //
 // the service or tester wants to create a Raft server. the ports
 // of all the Raft servers (including this one) are in peers[]. this
@@ -628,15 +648,20 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.commitIndex = 0 // Initialized to 0, increases monotonically
 	rf.lastApplied = 0 // Initialized to 0, increases monotonically
 
+
 	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
 	rf.grantingVote = make(chan bool, len(rf.peers))
 	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
 	rf.winsElection = false
 
+	rf.committable = make(chan bool, len(rf.peers))
+
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
 
 	go rf.run()
+
+	go rf.waitForCommit()
 
 	return rf
 }
