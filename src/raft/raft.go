@@ -73,7 +73,7 @@ type LogEntry struct {
 }
 
 func (le *LogEntry) String() string {
-	return fmt.Sprintf("<%d,%d,%v>", le.Index, le.Term, le.Command)
+	return fmt.Sprintf("<I.%d,T%d,%v>", le.Index, le.Term, le.Command)
 }
 
 //
@@ -84,6 +84,7 @@ type Raft struct {
 	peers     []*labrpc.ClientEnd
 	persister *Persister
 	me        int // index into peers[]
+	applyCh   chan ApplyMsg
 
 	// Your data here.
 	// Look at the paper's Figure 2 for a description of what
@@ -233,16 +234,15 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
+	// Note: currentTerm will be modified later.
+	reply.Term = rf.currentTerm
+
 	// If a server receives a request with a stale term number,
 	// it rejects the request.
 	if rf.currentTerm > args.Term {
 		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
-		reply.Term = rf.currentTerm
 		return
 	}
-
-	// Note: currentTerm will be modified later.
-	reply.Term = rf.currentTerm
 
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
 	// it updates its current term to the larger value.
@@ -259,9 +259,12 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 
 	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
 	rf.log = append(rf.log, args.Entries...) // `...' means appending all entries
-	log.Printf("[%d] append its log, len(log) = %d", rf.me, len(rf.log))
+	if len(args.Entries) > 0 {
+		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
+	}
 	reply.Success = true
 	reply.NextIndex = rf.getLastLogEntry().Index + 1
+
 }
 
 //
@@ -282,7 +285,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 // the struct itself.
 //
 func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *RequestVoteReply) bool {
-	log.Printf("[%d]->[%d] SEND RequestVote RPC, term = %d", rf.me, server, rf.currentTerm)
+	log.Printf("[%d]->[%d] SEND RequestVote RPC (T%d)", rf.me, server, rf.currentTerm)
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
 	if ok {
 		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, server, reply.VoteGranted)
@@ -293,15 +296,20 @@ func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *Request
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
 	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
 	if isEmptyHeartbeat {
-		log.Printf("[%d]->[%d] SEND heartbeat, term = %d", rf.me, server, args.Term)
+		log.Printf("[%d]->[%d] SEND heartbeat (T%d)", rf.me, server, args.Term)
 	} else {
-		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLogIndex = %d, prevLogTerm = %d, len(entries) = %d",
-			rf.me, server, args.PrevLogIndex, args.PrevLogTerm, len(args.Entries))
+		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLog = (I.%d,T%d), entries = (I.%d)~(I.%d)",
+			rf.me, server, args.PrevLogIndex, args.PrevLogTerm, args.Entries[0].Index, args.Entries[len(args.Entries)-1].Index)
 	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	if ok {
 		if !isEmptyHeartbeat {
 			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, server, reply.Success)
+			if reply.Success {
+				lastNextIndex := rf.nextIndex[server]
+				rf.nextIndex[server] = args.Entries[len(args.Entries)-1].Index + 1
+				log.Printf("[%d].nextIndex[%d]: %d->%d", rf.me, server, lastNextIndex, rf.nextIndex[server])
+			}
 		}
 	}
 	return ok
@@ -364,7 +372,7 @@ func (rf *Raft) runAsFollower() {
 
 	select {
 	case <- rf.receivedHeartbeat:
-		log.Printf("Follower [%d] received heartbeat, remains follower", rf.me)
+		//log.Printf("Follower [%d] received heartbeat, remains follower", rf.me)
 	case <- rf.grantingVote:
 		log.Printf("Follower [%d] is granting vote, remains follower", rf.me)
 	case <- timeout:
@@ -530,6 +538,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.peers = peers
 	rf.persister = persister
 	rf.me = me
+	rf.applyCh = applyCh
 
 	// Your initialization code here.
 
@@ -588,7 +597,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		// If command received from client: append entry to log,
 		// respond after entry applied to state machine.
 
-		log.Printf("COMMAND received from client: {%d}", command)
+		log.Printf("================== COMMAND received from client: {%d}", command)
 
 		index = rf.getLastLogEntry().Index + 1
 
