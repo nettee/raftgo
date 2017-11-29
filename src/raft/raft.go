@@ -332,14 +332,15 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 	args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
 	args.PrevLogIndex = rf.nextIndex[i] - 1
 	args.PrevLogTerm = rf.getLogEntry(args.PrevLogIndex).Term
-	args.Entries = make([]LogEntry, rf.getLastLogEntry().Index - args.PrevLogIndex)
-	nextIndexI := rf.nextIndex[i]
-	copy(args.Entries, rf.log[nextIndexI:])
+
+	logEntriesToSend := rf.log[rf.nextIndex[i]:]
+	args.Entries = make([]LogEntry, len(logEntriesToSend))
+	copy(args.Entries, logEntriesToSend)
 
 	reply := AppendEntriesReply{}
 	ok := rf.sendAppendEntries(i, args, &reply)
 
-	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
+	isEmptyHeartbeat := len(args.Entries) == 0
 	if ok {
 		if !isEmptyHeartbeat {
 			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, i, reply.Success)
@@ -360,6 +361,31 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 		} else {
 			// TODO
 		}
+	}
+}
+
+func (rf *Raft) checkCommittable() {
+
+	committableIndex := rf.commitIndex
+	for i := rf.commitIndex + 1; i < len(rf.log); i++ {
+		le := rf.log[i]
+		nr := 0
+		for j := range rf.peers {
+			if j == rf.me || (rf.matchIndex[j] >= i && le.Term == rf.currentTerm) {
+				nr++
+			}
+		}
+		if nr > len(rf.peers) / 2 {
+			committableIndex = i
+		}
+	}
+	if committableIndex > rf.commitIndex {
+		log.Printf("[%d] check committable after (I.%d): logs until (I.%d) is committable",
+			rf.me, rf.commitIndex, committableIndex)
+		rf.commitIndex = committableIndex
+	} else {
+		log.Printf("[%d] check committable after (I.%d): no more logs committable",
+			rf.me, rf.commitIndex)
 	}
 }
 
@@ -522,6 +548,8 @@ func (rf *Raft) runAsLeader() {
 	rf.mu.Unlock()
 
 	timeout := time.After(rf.heartbeatTimeout())
+
+	rf.checkCommittable()
 
 	// Repeat sending initial empty AppendEntries RPCs (heartbeats) to each server
 	for i := range rf.peers {
