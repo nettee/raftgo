@@ -98,16 +98,21 @@ type Raft struct {
 	votedFor int // CandidateId that received vote in current term (or -1 if none)
 	log []LogEntry // Log entries (first index is 1)
 
+	// Volatile states on all servers
+	commitIndex int // Index of highest log entry known to be committed
+	lastApplied int // Index of highest log entry applied to state machine
+
+	// Volatile states on leaders
+	// (Reinitialized after election)
+	nextIndex []int // nextIndex[i] - index of the next log entry to send to server[i]
+	matchIndex []int // matchIndex[i] - index of highest log entry known to be replicated on server[i]
+
 	// Volatile states during leader election
 	votes         int       // Number of votes received, only for Candidate
 	majorityVotes chan bool // Signals that the candidate receives majority votes
 	winsElection bool
 	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
 	grantingVote chan bool // Signals that the follower is granting votes to candidate
-
-	// Volatile states on leaders
-	nextIndex []int // nextIndex[i] - index of the next log entry to send to server[i]
-
 }
 
 // return currentTerm and whether this server
@@ -305,11 +310,22 @@ func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *App
 	if ok {
 		if !isEmptyHeartbeat {
 			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, server, reply.Success)
-			if reply.Success {
+		}
+		if reply.Success {
+			if !isEmptyHeartbeat {
 				lastNextIndex := rf.nextIndex[server]
-				rf.nextIndex[server] = args.Entries[len(args.Entries)-1].Index + 1
-				log.Printf("[%d].nextIndex[%d]: %d->%d", rf.me, server, lastNextIndex, rf.nextIndex[server])
+				lastMatchIndex := rf.matchIndex[server]
+				// All log entries in args.Entries are known to be replicated on that server.
+				// The next log entry to send to that server: a brand new entry.
+				rf.matchIndex[server] = args.Entries[len(args.Entries)-1].Index
+				rf.nextIndex[server] = rf.matchIndex[server] + 1
+				log.Printf("[%d].nextIndex[%d]: %d->%d, .matchIndex[%d]: %d->%d",
+					rf.me, server, lastNextIndex, rf.nextIndex[server],
+						server, lastMatchIndex, rf.matchIndex[server])
 			}
+			// If args.Entries is empty, we do not need to update matchIndex or nextIndex.
+		} else {
+			// TODO
 		}
 	}
 	return ok
@@ -355,6 +371,15 @@ func (rf *Raft) roleTransition(newRole Role) {
 
 	if oldRole == Candidate {
 		rf.winsElection = false // Reset variable
+	}
+}
+
+func (rf *Raft) initializeLeaderStates() {
+	rf.nextIndex = make([]int, len(rf.peers))
+	rf.matchIndex = make([]int, len(rf.peers))
+	for i := range rf.peers {
+		rf.nextIndex[i] = rf.getLastLogEntry().Index + 1
+		rf.matchIndex[i] = 0
 	}
 }
 
@@ -443,11 +468,7 @@ func (rf *Raft) runAsCandidate() {
 	case <- rf.majorityVotes:
 		log.Printf("Candidate [%d] wins an election", rf.me)
 		rf.roleTransition(Leader)
-		// Initialize states for leaders
-		rf.nextIndex = make([]int, len(rf.peers))
-		for i := range rf.peers {
-			rf.nextIndex[i] = rf.getLastLogEntry().Index + 1
-		}
+		rf.initializeLeaderStates()
 		return
 	case <- rf.receivedHeartbeat:
 		log.Printf("Candidate [%d] received heartbeat from new leader", rf.me)
@@ -542,20 +563,20 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// Your initialization code here.
 
-	// (Figure2-State) initialized to 0 on first boot
-	rf.currentTerm = 0
-
-	// Vote for nobody
-	rf.votedFor = -1
-
-	// Add a dummy log entry to ensure the index of real log entries start from 1
-	rf.log = append(rf.log, LogEntry{Index: 0, Term: 0, Command: nil})
-
-
 	// (S5.2-P1) When servers start up, they begin as followers.
 	rf.role = Follower
 	log.Printf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
 	rf.dead = make(chan bool, len(rf.peers))
+
+	// Persistent states on all servers
+	rf.currentTerm = 0 // (Figure2-State) initialized to 0 on first boot
+	rf.votedFor = -1 // Vote for nobody
+	// Add a dummy log entry to ensure the index of real log entries start from 1
+	rf.log = append(rf.log, LogEntry{Index: 0, Term: 0, Command: nil})
+
+	// Volatile states on all servers
+	rf.commitIndex = 0 // Initialized to 0, increases monotonically
+	rf.lastApplied = 0 // Initialized to 0, increases monotonically
 
 	rf.receivedHeartbeat = make(chan bool, len(rf.peers))
 	rf.grantingVote = make(chan bool, len(rf.peers))
