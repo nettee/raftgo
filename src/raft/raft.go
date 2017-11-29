@@ -234,43 +234,6 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	reply.VoteGranted = voteGranted
 }
 
-func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
-
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
-
-	// Note: currentTerm will be modified later.
-	reply.Term = rf.currentTerm
-
-	// If a server receives a request with a stale term number,
-	// it rejects the request.
-	if rf.currentTerm > args.Term {
-		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
-		return
-	}
-
-	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
-	// it updates its current term to the larger value.
-	if rf.currentTerm < args.Term {
-		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
-	}
-
-	rf.receivedHeartbeat <- true
-
-	// TODO when args.PrevLogIndex > rf.getLastLogEntry().Index
-
-	// TODO check log term matching
-
-	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
-	rf.log = append(rf.log, args.Entries...) // `...' means appending all entries
-	if len(args.Entries) > 0 {
-		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
-	}
-	reply.Success = true
-	reply.NextIndex = rf.getLastLogEntry().Index + 1
-
-}
 
 //
 // example code to send a RequestVote RPC to a server.
@@ -298,6 +261,53 @@ func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *Request
 	return ok
 }
 
+func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	// Note: currentTerm will be modified later.
+	reply.Term = rf.currentTerm
+
+	// If a server receives a request with a stale term number, it rejects the request.
+	// (Figure2) 1. Reply false if term < currentTerm.
+	if rf.currentTerm > args.Term {
+		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
+		reply.Success = false
+		return
+	}
+
+	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
+	// it updates its current term to the larger value.
+	if rf.currentTerm < args.Term {
+		rf.currentTerm = args.Term
+		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
+	}
+
+	rf.receivedHeartbeat <- true
+
+	// TODO when args.PrevLogIndex > rf.getLastLogEntry().Index
+	// TODO check log term match
+	// (Figure2) 2. Reply false if log doesn't contain any entry
+	// at prevLogIndex whose term matches prevLogTerm.
+
+	// (Figure2) 3. If an existing entry conflicts with a new one (same index
+	// but different terms), delete the existing entry and all that follow it.
+
+	// (Figure2) 4. Append any new entries not already in the log.
+	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
+	rf.log = append(rf.log, args.Entries...) // `...' means appending all entries
+	if len(args.Entries) > 0 {
+		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
+	}
+	reply.Success = true
+	reply.NextIndex = rf.getLastLogEntry().Index + 1
+
+	// (Figure2) 5. If leaderCommit > commitIndex,
+	// set commitIndex = min(leaderCommit, index of last new entry)
+
+}
+
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
 	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
 	if isEmptyHeartbeat {
@@ -307,28 +317,50 @@ func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *App
 			rf.me, server, args.PrevLogIndex, args.PrevLogTerm, args.Entries[0].Index, args.Entries[len(args.Entries)-1].Index)
 	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
+	return ok
+}
+
+func (rf *Raft) sendAppendEntriesRPC(i int) {
+
+	// (Figure2) Leaders:
+	// If last log index >= nextIndex[i]:
+	// send AppendEntries RPC with log entries starting at nextIndex[i]
+	// * If successful: update nextIndex[i] and matchIndex[i]
+	// * If AppendEntries fails because of log inconsistency:
+	// 	     decrement nextIndex[i] and retry
+
+	args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
+	args.PrevLogIndex = rf.nextIndex[i] - 1
+	args.PrevLogTerm = rf.getLogEntry(args.PrevLogIndex).Term
+	args.Entries = make([]LogEntry, rf.getLastLogEntry().Index - args.PrevLogIndex)
+	nextIndexI := rf.nextIndex[i]
+	copy(args.Entries, rf.log[nextIndexI:])
+
+	reply := AppendEntriesReply{}
+	ok := rf.sendAppendEntries(i, args, &reply)
+
+	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
 	if ok {
 		if !isEmptyHeartbeat {
-			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, server, reply.Success)
+			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, i, reply.Success)
 		}
 		if reply.Success {
 			if !isEmptyHeartbeat {
-				lastNextIndex := rf.nextIndex[server]
-				lastMatchIndex := rf.matchIndex[server]
+				lastNextIndex := rf.nextIndex[i]
+				lastMatchIndex := rf.matchIndex[i]
 				// All log entries in args.Entries are known to be replicated on that server.
 				// The next log entry to send to that server: a brand new entry.
-				rf.matchIndex[server] = args.Entries[len(args.Entries)-1].Index
-				rf.nextIndex[server] = rf.matchIndex[server] + 1
+				rf.matchIndex[i] = args.Entries[len(args.Entries)-1].Index
+				rf.nextIndex[i] = rf.matchIndex[i] + 1
 				log.Printf("[%d].nextIndex[%d]: %d->%d, .matchIndex[%d]: %d->%d",
-					rf.me, server, lastNextIndex, rf.nextIndex[server],
-						server, lastMatchIndex, rf.matchIndex[server])
+					rf.me, i, lastNextIndex, rf.nextIndex[i],
+					i, lastMatchIndex, rf.matchIndex[i])
 			}
 			// If args.Entries is empty, we do not need to update matchIndex or nextIndex.
 		} else {
 			// TODO
 		}
 	}
-	return ok
 }
 
 func (rf *Raft) getLastLogEntry() LogEntry {
@@ -492,20 +524,10 @@ func (rf *Raft) runAsLeader() {
 	timeout := time.After(rf.heartbeatTimeout())
 
 	// Repeat sending initial empty AppendEntries RPCs (heartbeats) to each server
-	for serverId := 0; serverId < len(rf.peers); serverId++ {
-		if serverId == rf.me {
-			continue
+	for i := range rf.peers {
+		if i != rf.me {
+			go rf.sendAppendEntriesRPC(i)
 		}
-		go func(i int) {
-			args := AppendEntriesArgs{Term: rf.currentTerm, LeaderId: rf.me}
-			args.PrevLogIndex = rf.nextIndex[i] - 1
-			args.PrevLogTerm = rf.getLogEntry(args.PrevLogIndex).Term
-			args.Entries = make([]LogEntry, rf.getLastLogEntry().Index - args.PrevLogIndex)
-			copy(args.Entries, rf.getLogEntriesToSend(rf.nextIndex[i]))
-
-			reply := AppendEntriesReply{}
-			rf.sendAppendEntries(i, args, &reply)
-		} (serverId)
 	}
 
 	if rf.role != Leader {
