@@ -217,21 +217,44 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.CandidateId)
+		log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, args.CandidateId)
 		rf.votedFor = -1
 	}
 
 	// (Figure2) 2. If votedFor is null(-1) or candidateId, and candidate's
 	// log is at least as up-to-date as receiver's log, grant vote
-	if rf.votedFor == -1 || rf.votedFor == args.CandidateId {
-		rf.votedFor = args.CandidateId
-		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
-		reply.VoteGranted = true
-		rf.grantingVote <- true
-	} else {
-		log.Printf("[%d] already voted another server", rf.me)
+
+	if rf.votedFor != -1 && rf.votedFor != args.CandidateId {
+		log.Printf("No vote: [%d] already voted another server", rf.me)
 		reply.VoteGranted = false
+		return
 	}
+
+	// The voter denies its vote if its own log is more up-to-date than that of
+	// the candidate.
+	// Which log is up-to-date?
+	// 1. If the logs have last entries with different terms, then the log with
+	//    the later term is more up-to-date.
+	// 2. If the logs end with the same term, then whichever log is longer is
+	//    more up-to-date.
+	var upToDate bool // Whether the candidate's log is up to date
+	if args.LastLogTerm > rf.getLastLogEntry().Term {
+		upToDate = true
+	} else if args.LastLogTerm < rf.getLastLogEntry().Term {
+		upToDate = false
+	} else {
+		upToDate = args.LastLogIndex >= rf.getLastLogEntry().Index
+	}
+	if !upToDate {
+		log.Printf("No vote: [%d]'s log is more up-to-date than candidate [%d]", rf.me, args.CandidateId)
+		return
+	}
+
+	// Grant vote
+	rf.votedFor = args.CandidateId
+	log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
+	reply.VoteGranted = true
+	rf.grantingVote <- true
 }
 
 //
@@ -252,7 +275,9 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 // the struct itself.
 //
 func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *RequestVoteReply) bool {
-	log.Printf("[%d]->[%d] SEND RequestVote RPC (T%d)", rf.me, server, rf.currentTerm)
+	log.Printf("[%d]->[%d] SEND RequestVote RPC (T%d), lastLog = (I.%d)(T%d)",
+		rf.me, server, rf.currentTerm,
+			args.LastLogIndex, args.LastLogTerm)
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
 	if ok {
 		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, server, reply.VoteGranted)
