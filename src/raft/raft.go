@@ -327,7 +327,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
+		log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
 	}
 
 	rf.receivedHeartbeat <- true
@@ -405,6 +405,14 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 		if !isEmptyHeartbeat {
 			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, i, reply.Success)
 		}
+
+		if reply.Term > rf.currentTerm {
+			rf.currentTerm = reply.Term
+			log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, i)
+			rf.votedFor = -1 // TODO organize re-initialization codes
+			rf.roleTransition(Follower)
+		}
+
 		if reply.Success {
 			if !isEmptyHeartbeat {
 				lastNextIndex := rf.nextIndex[i]
