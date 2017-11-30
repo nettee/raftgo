@@ -115,7 +115,7 @@ type Raft struct {
 	grantingVote chan bool // Signals that the follower is granting votes to candidate
 
 	// Volatile states during log replication
-	committable chan bool // Signals that the server can commit new logs
+	appliable chan bool // Signals that the server can commit new logs
 }
 
 // return currentTerm and whether this server
@@ -308,6 +308,15 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 
 	// (Figure2) 5. If leaderCommit > commitIndex,
 	// set commitIndex = min(leaderCommit, index of last new entry)
+	if args.LeaderCommit > rf.commitIndex {
+		lastIndex := rf.getLastLogEntry().Index
+		if args.LeaderCommit < lastIndex {
+			rf.commitIndex = args.LeaderCommit
+		} else {
+			rf.commitIndex = lastIndex
+		}
+		rf.appliable <- true
+	}
 
 }
 
@@ -316,8 +325,10 @@ func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *App
 	if isEmptyHeartbeat {
 		log.Printf("[%d]->[%d] SEND heartbeat (T%d)", rf.me, server, args.Term)
 	} else {
-		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLog = (I.%d,T%d), entries = (I.%d)~(I.%d)",
-			rf.me, server, args.PrevLogIndex, args.PrevLogTerm, args.Entries[0].Index, args.Entries[len(args.Entries)-1].Index)
+		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLog = (I.%d,T%d), entries = (I.%d)~(I.%d), leaderCommit = %d",
+			rf.me, server, args.PrevLogIndex, args.PrevLogTerm,
+				args.Entries[0].Index, args.Entries[len(args.Entries)-1].Index,
+					args.LeaderCommit)
 	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	return ok
@@ -339,6 +350,8 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 	logEntriesToSend := rf.log[rf.nextIndex[i]:]
 	args.Entries = make([]LogEntry, len(logEntriesToSend))
 	copy(args.Entries, logEntriesToSend)
+
+	args.LeaderCommit = rf.commitIndex
 
 	reply := AppendEntriesReply{}
 	ok := rf.sendAppendEntries(i, args, &reply)
@@ -367,9 +380,9 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 	}
 }
 
-func (rf *Raft) checkCommittable() {
+func (rf *Raft) checkCommitted() {
 
-	committableIndex := rf.commitIndex
+	committedIndex := rf.commitIndex
 	for i := rf.commitIndex + 1; i < len(rf.log); i++ {
 		le := rf.log[i]
 		nr := 0
@@ -379,18 +392,23 @@ func (rf *Raft) checkCommittable() {
 			}
 		}
 		if nr > len(rf.peers) / 2 {
-			committableIndex = i
+			committedIndex = i
 		}
 	}
-	if committableIndex > rf.commitIndex {
-		log.Printf("[%d] check committable after (I.%d): logs until (I.%d) is committable",
-			rf.me, rf.commitIndex, committableIndex)
-		rf.commitIndex = committableIndex
-		rf.committable <- true
+	if committedIndex > rf.commitIndex {
+		log.Printf("[%d] check committed logs after (I.%d): logs until (I.%d) is committed",
+			rf.me, rf.commitIndex, committedIndex)
+		rf.commitIndex = committedIndex
+		rf.appliable <- true
 	} else {
-		log.Printf("[%d] check committable after (I.%d): no more logs committable",
+		log.Printf("[%d] check committed logs after (I.%d): no more logs committed",
 			rf.me, rf.commitIndex)
 	}
+}
+
+func (rf *Raft) apply(le LogEntry) {
+	log.Printf("APPLY: %s by %s [%d]", le.String(), rf.role, rf.me)
+	rf.applyCh <- ApplyMsg{Index: le.Index, Command: le.Command}
 }
 
 func (rf *Raft) getLastLogEntry() LogEntry {
@@ -553,7 +571,7 @@ func (rf *Raft) runAsLeader() {
 
 	timeout := time.After(rf.heartbeatTimeout())
 
-	rf.checkCommittable()
+	rf.checkCommitted()
 
 	// Repeat sending initial empty AppendEntries RPCs (heartbeats) to each server
 	for i := range rf.peers {
@@ -598,12 +616,11 @@ func (rf *Raft) run() {
 func (rf *Raft) waitForCommit() {
 	for {
 		select {
-		case <- rf.committable:
+		case <- rf.appliable:
 			rf.mu.Lock()
 			for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
 				le := rf.log[i]
-				log.Printf("[%d] COMMIT %s", rf.me, le.String())
-				rf.applyCh <- ApplyMsg{Index: le.Index, Command: le.Command}
+				go rf.apply(le)
 				rf.lastApplied = i
 			}
 			rf.mu.Unlock()
@@ -654,7 +671,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
 	rf.winsElection = false
 
-	rf.committable = make(chan bool, len(rf.peers))
+	rf.appliable = make(chan bool, len(rf.peers))
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
