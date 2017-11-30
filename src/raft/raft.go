@@ -651,7 +651,7 @@ func (rf *Raft) waitForCommit() {
 			les := rf.log[rf.lastApplied+1:rf.commitIndex+1]
 			go rf.apply(les...)
 			rf.lastApplied = rf.commitIndex
-			
+
 			//for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
 			//	le := rf.log[i]
 			//	go rf.apply(le)
