@@ -77,6 +77,41 @@ func (le *LogEntry) String() string {
 }
 
 //
+// example RequestVote RPC arguments structure.
+//
+type RequestVoteArgs struct {
+	// Your data here.
+	Term        int // candidate's Term
+	CandidateId int // candidate's Id
+	LastLogIndex int // index of candidate's last log entry
+	LastLogTerm int // term of candidate's last log entry
+}
+
+//
+// example RequestVote RPC reply structure.
+//
+type RequestVoteReply struct {
+	// Your data here.
+	Term int // currentTerm, for candidate to update itself
+	VoteGranted bool // true means candidate received vote
+}
+
+type AppendEntriesArgs struct {
+	Term int // Leader's term
+	LeaderId int // Leader's ID
+	PrevLogIndex int // Index of log entry immediately preceding new ones
+	PrevLogTerm int // Term of PrevLogIndex entry
+	Entries []LogEntry // Log entries to store (empty for heartbeat)
+	LeaderCommit int // Leader's commitIndex
+}
+
+type AppendEntriesReply struct {
+	Term int // currentTerm, for leader to update itself
+	Success bool // true if follower contained entry matching prevLogIndex and prevLogTerm
+	NextIndex int
+}
+
+//
 // A Go object implementing a single Raft peer.
 //
 type Raft struct {
@@ -158,42 +193,6 @@ func (rf *Raft) readPersist(data []byte) {
 	// d.Decode(&rf.yyy)
 }
 
-
-
-
-//
-// example RequestVote RPC arguments structure.
-//
-type RequestVoteArgs struct {
-	// Your data here.
-	Term        int // candidate's Term
-	CandidateId int
-}
-
-//
-// example RequestVote RPC reply structure.
-//
-type RequestVoteReply struct {
-	// Your data here.
-	Term int // currentTerm, for candidate to update itself
-	VoteGranted bool // true means candidate received vote
-}
-
-type AppendEntriesArgs struct {
-	Term int // Leader's term
-	LeaderId int // Leader's ID
-	PrevLogIndex int // Index of log entry immediately preceding new ones
-	PrevLogTerm int // Term of PrevLogIndex entry
-	Entries []LogEntry // Log entries to store (empty for heartbeat)
-	LeaderCommit int // Leader's commitIndex
-}
-
-type AppendEntriesReply struct {
-	Term int // currentTerm, for leader to update itself
-	Success bool // true if follower contained entry matching prevLogIndex and prevLogTerm
-	NextIndex int
-}
-
 //
 // example RequestVote RPC handler.
 //
@@ -203,40 +202,37 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	var voteGranted bool
+	// Note: currentTerm will be modified later.
+	reply.Term = rf.currentTerm
+
+	// If a server receives a request with a stale term number, it rejects the request.
+	// (Figure2) 1. Reply false if term < currentTerm
+	if rf.currentTerm > args.Term {
+		log.Printf("[%d] rejected [%d]", rf.me, args.CandidateId)
+		reply.VoteGranted = false
+		return
+	}
 
 	// (S5.1-P3) If one server’s current term is smaller than the other’s, then
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
 		log.Printf("[%d] updates its term = %d according to [%d]", rf.me, rf.currentTerm, args.CandidateId)
+		rf.votedFor = -1
+	}
+
+	// (Figure2) 2. If votedFor is null(-1) or candidateId, and candidate's
+	// log is at least as up-to-date as receiver's log, grant vote
+	if rf.votedFor == -1 || rf.votedFor == args.CandidateId {
 		rf.votedFor = args.CandidateId
 		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
-		voteGranted = true
-
-		// If a server receives a request with a stale term number,
-		// it rejects the request.
-	} else if rf.currentTerm > args.Term {
-		log.Printf("[%d] rejected [%d]", rf.me, args.CandidateId)
-		voteGranted = false
-
-	} else if rf.votedFor == -1 {
-		rf.votedFor = args.CandidateId
-		log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
-		voteGranted = true
+		reply.VoteGranted = true
+		rf.grantingVote <- true
 	} else {
 		log.Printf("[%d] already voted another server", rf.me)
-		voteGranted = false
+		reply.VoteGranted = false
 	}
-
-	if voteGranted {
-		rf.grantingVote <- true
-	}
-
-	reply.Term = rf.currentTerm
-	reply.VoteGranted = voteGranted
 }
-
 
 //
 // example code to send a RequestVote RPC to a server.
@@ -262,6 +258,28 @@ func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *Request
 		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, server, reply.VoteGranted)
 	}
 	return ok
+}
+
+func (rf *Raft) sendRequestVoteRPC(i int) {
+
+	args := RequestVoteArgs{Term: rf.currentTerm, CandidateId: rf.me}
+	args.LastLogIndex = rf.getLastLogEntry().Index
+	args.LastLogTerm = rf.getLastLogEntry().Term
+
+	reply := RequestVoteReply{}
+	ok := rf.sendRequestVote(i, args, &reply)
+
+	if ok && reply.VoteGranted {
+		rf.mu.Lock()
+		rf.votes++
+		if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
+			// This candidate has received votes from majority of servers
+			// Send signal that it wins an election
+			rf.winsElection = true
+			rf.majorityVotes <- true
+		}
+		rf.mu.Unlock()
+	}
 }
 
 func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) {
@@ -296,6 +314,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 
 	// (Figure2) 3. If an existing entry conflicts with a new one (same index
 	// but different terms), delete the existing entry and all that follow it.
+
 
 	// (Figure2) 4. Append any new entries not already in the log.
 	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
@@ -513,26 +532,10 @@ func (rf *Raft) runAsCandidate() {
 	timeout := time.After(rf.electionTimeout())
 
 	// 4. Send RequestVote RPCs to all other servers
-	for serverId := 0; serverId < len(rf.peers); serverId++ {
-		if serverId == rf.me {
-			continue
+	for i := range rf.peers {
+		if i != rf.me {
+			go rf.sendRequestVoteRPC(i)
 		}
-		go func(i int) {
-			args := RequestVoteArgs{Term: rf.currentTerm, CandidateId: rf.me}
-			reply := RequestVoteReply{}
-			rf.sendRequestVote(i, args, &reply)
-			if reply.VoteGranted {
-				rf.mu.Lock()
-				rf.votes++
-				if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
-					// This candidate has received votes from majority of servers
-					// Send signal that it wins an election
-					rf.winsElection = true
-					rf.majorityVotes <- true
-				}
-				rf.mu.Unlock()
-			}
-		} (serverId)
 	}
 
 	if rf.role != Candidate {
