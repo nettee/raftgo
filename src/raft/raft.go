@@ -450,9 +450,11 @@ func (rf *Raft) checkCommitted() {
 	}
 }
 
-func (rf *Raft) apply(le LogEntry) {
-	log.Printf("APPLY: %s by %s [%d]", le.String(), rf.role, rf.me)
-	rf.applyCh <- ApplyMsg{Index: le.Index, Command: le.Command}
+func (rf *Raft) apply(les ...LogEntry) {
+	for _, le := range les {
+		log.Printf("APPLY: %s by %s [%d]", le.String(), rf.role, rf.me)
+		rf.applyCh <- ApplyMsg{Index: le.Index, Command: le.Command}
+	}
 }
 
 func (rf *Raft) getLastLogEntry() LogEntry {
@@ -646,11 +648,15 @@ func (rf *Raft) waitForCommit() {
 		select {
 		case <- rf.appliable:
 			rf.mu.Lock()
-			for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
-				le := rf.log[i]
-				go rf.apply(le)
-				rf.lastApplied = i
-			}
+			les := rf.log[rf.lastApplied+1:rf.commitIndex+1]
+			go rf.apply(les...)
+			rf.lastApplied = rf.commitIndex
+			
+			//for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
+			//	le := rf.log[i]
+			//	go rf.apply(le)
+			//	rf.lastApplied = i
+			//}
 			rf.mu.Unlock()
 		}
 	}
