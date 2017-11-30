@@ -354,12 +354,14 @@ func TestBackup(t *testing.T) {
 	cfg.one(rand.Int(), servers)
 
 	// put leader and one follower in a partition
+	fmt.Println("Test: put leader and one follower in a partition")
 	leader1 := cfg.checkOneLeader()
 	cfg.disconnect((leader1 + 2) % servers)
 	cfg.disconnect((leader1 + 3) % servers)
 	cfg.disconnect((leader1 + 4) % servers)
 
 	// submit lots of commands that won't commit
+	fmt.Println("Test: submit lots of commands that won't commit")
 	for i := 0; i < 50; i++ {
 		cfg.rafts[leader1].Start(rand.Int())
 	}
