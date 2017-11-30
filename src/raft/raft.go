@@ -336,10 +336,16 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// TODO check log term match
 	// (Figure2) 2. Reply false if log doesn't contain any entry
 	// at prevLogIndex whose term matches prevLogTerm.
+	if args.PrevLogIndex > rf.getLastLogEntry().Index {
+		log.Printf("No append: [%d] has no log of index (I.%d)", rf.me, args.PrevLogIndex)
+	}
+	if le := rf.log[args.PrevLogIndex]; le.Term != args.PrevLogTerm {
+		log.Printf("No append: [%d]'s log (I.%d,T%d) does not match prevLog = (I.%d,T%d)",
+			rf.me, le.Index, le.Term, args.PrevLogIndex, args.PrevLogTerm)
+	}
 
 	// (Figure2) 3. If an existing entry conflicts with a new one (same index
 	// but different terms), delete the existing entry and all that follow it.
-
 
 	// (Figure2) 4. Append any new entries not already in the log.
 	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
@@ -367,7 +373,8 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
 	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
 	if isEmptyHeartbeat {
-		log.Printf("[%d]->[%d] SEND heartbeat (T%d)", rf.me, server, args.Term)
+		log.Printf("[%d]->[%d] SEND heartbeat (T%d), prevLog = (I.%d,T%d)",
+			rf.me, server, args.Term, args.PrevLogIndex, args.PrevLogTerm)
 	} else {
 		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLog = (I.%d,T%d), entries = (I.%d)~(I.%d), leaderCommit = %d",
 			rf.me, server, args.PrevLogIndex, args.PrevLogTerm,
