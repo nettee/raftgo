@@ -108,7 +108,6 @@ type AppendEntriesArgs struct {
 type AppendEntriesReply struct {
 	Term int // currentTerm, for leader to update itself
 	Success bool // true if follower contained entry matching prevLogIndex and prevLogTerm
-	NextIndex int
 }
 
 //
@@ -332,20 +331,23 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 
 	rf.receivedHeartbeat <- true
 
-	// TODO when args.PrevLogIndex > rf.getLastLogEntry().Index
-	// TODO check log term match
 	// (Figure2) 2. Reply false if log doesn't contain any entry
 	// at prevLogIndex whose term matches prevLogTerm.
 	if args.PrevLogIndex > rf.getLastLogEntry().Index {
 		log.Printf("No append: [%d] has no log of index (I.%d)", rf.me, args.PrevLogIndex)
+		reply.Success = false
+		return
 	}
 	if le := rf.log[args.PrevLogIndex]; le.Term != args.PrevLogTerm {
 		log.Printf("No append: [%d]'s log (I.%d,T%d) does not match prevLog = (I.%d,T%d)",
 			rf.me, le.Index, le.Term, args.PrevLogIndex, args.PrevLogTerm)
+		reply.Success = false
+		return
 	}
 
 	// (Figure2) 3. If an existing entry conflicts with a new one (same index
 	// but different terms), delete the existing entry and all that follow it.
+	// TODO check log term match
 
 	// (Figure2) 4. Append any new entries not already in the log.
 	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
@@ -354,7 +356,6 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
 	}
 	reply.Success = true
-	reply.NextIndex = rf.getLastLogEntry().Index + 1
 
 	// (Figure2) 5. If leaderCommit > commitIndex,
 	// set commitIndex = min(leaderCommit, index of last new entry)
@@ -418,6 +419,7 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 			log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, i)
 			rf.votedFor = -1 // TODO organize re-initialization codes
 			rf.roleTransition(Follower)
+			return
 		}
 
 		if reply.Success {
@@ -434,7 +436,11 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 			}
 			// If args.Entries is empty, we do not need to update matchIndex or nextIndex.
 		} else {
-			// TODO
+			// Follower's log doesn't contain an etry matching prevLogIndex
+			// and prevLogTerm.
+			// (S5.3) The leader decrements nextIndex and retries AppendEntries RPC.
+			rf.nextIndex[i]--
+			log.Printf("[%d].nextIndex[%d] decrements to %d", rf.me, i, rf.nextIndex[i])
 		}
 	}
 }
