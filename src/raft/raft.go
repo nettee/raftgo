@@ -347,10 +347,9 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 
 	// (Figure2) 3. If an existing entry conflicts with a new one (same index
 	// but different terms), delete the existing entry and all that follow it.
-	// TODO check log term match
+	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
 
 	// (Figure2) 4. Append any new entries not already in the log.
-	rf.log = rf.log[:args.PrevLogIndex+1] // Truncate rf.log to log[0, prevLogIndex]
 	rf.log = append(rf.log, args.Entries...) // `...' means appending all entries
 	if len(args.Entries) > 0 {
 		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
