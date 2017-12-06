@@ -108,6 +108,7 @@ type AppendEntriesArgs struct {
 type AppendEntriesReply struct {
 	Term int // currentTerm, for leader to update itself
 	Success bool // true if follower contained entry matching prevLogIndex and prevLogTerm
+	NextIndex int
 }
 
 //
@@ -319,6 +320,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	if rf.currentTerm > args.Term {
 		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
 		reply.Success = false
+		reply.NextIndex = rf.getLastLogEntry().Index + 1
 		return
 	}
 
@@ -336,12 +338,15 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	if args.PrevLogIndex > rf.getLastLogEntry().Index {
 		log.Printf("No append: [%d] has no log of index (I.%d)", rf.me, args.PrevLogIndex)
 		reply.Success = false
+		reply.NextIndex = rf.getLastLogEntry().Index + 1
 		return
 	}
 	if le := rf.log[args.PrevLogIndex]; le.Term != args.PrevLogTerm {
 		log.Printf("No append: [%d]'s log (I.%d,T%d) does not match prevLog = (I.%d,T%d)",
 			rf.me, le.Index, le.Term, args.PrevLogIndex, args.PrevLogTerm)
 		reply.Success = false
+		// TODO how to calculate reply.NextIndex
+		reply.NextIndex = args.PrevLogIndex
 		return
 	}
 
@@ -355,6 +360,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
 	}
 	reply.Success = true
+	reply.NextIndex = rf.getLastLogEntry().Index + 1
 
 	// (Figure2) 5. If leaderCommit > commitIndex,
 	// set commitIndex = min(leaderCommit, index of last new entry)
@@ -438,7 +444,7 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 			// Follower's log doesn't contain an etry matching prevLogIndex
 			// and prevLogTerm.
 			// (S5.3) The leader decrements nextIndex and retries AppendEntries RPC.
-			rf.nextIndex[i]--
+			rf.nextIndex[i] = reply.NextIndex
 			log.Printf("[%d].nextIndex[%d] decrements to %d", rf.me, i, rf.nextIndex[i])
 		}
 	}
