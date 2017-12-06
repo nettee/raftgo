@@ -446,17 +446,20 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 
 func (rf *Raft) checkCommitted() {
 
+	// (Figure2) If there exists an N such that N > commitIndex,
+	// a majority of matchIndex[i] >= N, and log[N].term == currentTerm:
+	// set commitIndex = N
+
 	committedIndex := rf.commitIndex
-	for i := rf.commitIndex + 1; i < len(rf.log); i++ {
-		le := rf.log[i]
+	for N := rf.commitIndex + 1; N < len(rf.log); N++ {
 		nr := 0
-		for j := range rf.peers {
-			if j == rf.me || (rf.matchIndex[j] >= i && le.Term == rf.currentTerm) {
+		for i := range rf.peers {
+			if i == rf.me || (rf.matchIndex[i] >= N && rf.log[N].Term == rf.currentTerm) {
 				nr++
 			}
 		}
 		if nr > len(rf.peers) / 2 {
-			committedIndex = i
+			committedIndex = N
 		}
 	}
 	if committedIndex > rf.commitIndex {
