@@ -345,8 +345,15 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 		log.Printf("No append: [%d]'s log (I.%d,T%d) does not match prevLog = (I.%d,T%d)",
 			rf.me, le.Index, le.Term, args.PrevLogIndex, args.PrevLogTerm)
 		reply.Success = false
+		nextIndex := args.PrevLogIndex
 		// TODO how to calculate reply.NextIndex
-		reply.NextIndex = args.PrevLogIndex
+		for i := args.PrevLogIndex - 1; i >= 0; i-- {
+			if rf.log[i].Term != le.Term {
+				nextIndex = i + 1
+				break
+			}
+		}
+		reply.NextIndex = nextIndex
 		return
 	}
 
