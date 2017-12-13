@@ -24,6 +24,8 @@ import (
 	"math/rand"
 	"time"
 	"fmt"
+	"encoding/gob"
+	"bytes"
 )
 
 // import "bytes"
@@ -173,12 +175,13 @@ func (rf *Raft) GetState() (int, bool) {
 func (rf *Raft) persist() {
 	// Your code here.
 	// Example:
-	// w := new(bytes.Buffer)
-	// e := gob.NewEncoder(w)
-	// e.Encode(rf.xxx)
-	// e.Encode(rf.yyy)
-	// data := w.Bytes()
-	// rf.persister.SaveRaftState(data)
+	 w := new(bytes.Buffer)
+	 e := gob.NewEncoder(w)
+	 e.Encode(rf.currentTerm)
+	 e.Encode(rf.votedFor)
+	 e.Encode(rf.log)
+	 data := w.Bytes()
+	 rf.persister.SaveRaftState(data)
 }
 
 //
@@ -187,10 +190,11 @@ func (rf *Raft) persist() {
 func (rf *Raft) readPersist(data []byte) {
 	// Your code here.
 	// Example:
-	// r := bytes.NewBuffer(data)
-	// d := gob.NewDecoder(r)
-	// d.Decode(&rf.xxx)
-	// d.Decode(&rf.yyy)
+	 r := bytes.NewBuffer(data)
+	 d := gob.NewDecoder(r)
+	 d.Decode(&rf.currentTerm)
+	 d.Decode(&rf.votedFor)
+	 d.Decode(&rf.log)
 }
 
 //
@@ -201,6 +205,7 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
+	defer rf.persist()
 
 	// Note: currentTerm will be modified later.
 	reply.Term = rf.currentTerm
@@ -311,6 +316,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
+	defer rf.persist()
 
 	// Note: currentTerm will be modified later.
 	reply.Term = rf.currentTerm
@@ -743,12 +749,16 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	rf.appliable = make(chan bool, len(rf.peers))
 
+	fmt.Println("a1")
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
+	fmt.Println("a2")
 
 	go rf.run()
 
 	go rf.waitForCommit()
+
+	fmt.Println("a3")
 
 	return rf
 }

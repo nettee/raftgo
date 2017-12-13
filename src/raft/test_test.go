@@ -549,6 +549,7 @@ func TestPersist1(t *testing.T) {
 	cfg.one(11, servers)
 
 	// crash and re-start all
+	fmt.Println("Test: crash and restart all servers")
 	for i := 0; i < servers; i++ {
 		cfg.start1(i)
 	}
@@ -560,11 +561,16 @@ func TestPersist1(t *testing.T) {
 	cfg.one(12, servers)
 
 	leader1 := cfg.checkOneLeader()
+	fmt.Printf("Test: crash and restart leader [%d]\n", leader1)
 	cfg.disconnect(leader1)
 	cfg.start1(leader1)
 	cfg.connect(leader1)
 
+	fmt.Println("aaa")
+
 	cfg.one(13, servers)
+
+	fmt.Println("bbb")
 
 	leader2 := cfg.checkOneLeader()
 	cfg.disconnect(leader2)
