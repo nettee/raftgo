@@ -297,16 +297,28 @@ func (rf *Raft) sendRequestVoteRPC(i int) {
 	reply := RequestVoteReply{}
 	ok := rf.sendRequestVote(i, args, &reply)
 
-	if ok && reply.VoteGranted {
-		rf.mu.Lock()
-		rf.votes++
-		if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
-			// This candidate has received votes from majority of servers
-			// Send signal that it wins an election
-			rf.winsElection = true
-			rf.majorityVotes <- true
+	if ok {
+
+		if reply.Term > rf.currentTerm {
+			rf.currentTerm = reply.Term
+			log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, i)
+			rf.votedFor = -1 // TODO organize re-initialization codes
+			rf.persist()
+			rf.roleTransition(Follower)
+			return
 		}
-		rf.mu.Unlock()
+
+		if reply.VoteGranted {
+			rf.mu.Lock()
+			rf.votes++
+			if rf.role == Candidate && !rf.winsElection && rf.votes > len(rf.peers)/2 {
+				// This candidate has received votes from majority of servers
+				// Send signal that it wins an election
+				rf.winsElection = true
+				rf.majorityVotes <- true
+			}
+			rf.mu.Unlock()
+		}
 	}
 }
 
