@@ -682,7 +682,7 @@ func (rf *Raft) run() {
 		case Leader:
 			rf.runAsLeader()
 		case Dead:
-			// do nothing
+			return
 		default:
 			log.Fatalf("Invalid rf.role %v", rf.role)
 		}

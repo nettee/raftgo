@@ -566,11 +566,7 @@ func TestPersist1(t *testing.T) {
 	cfg.start1(leader1)
 	cfg.connect(leader1)
 
-	fmt.Println("aaa")
-
 	cfg.one(13, servers)
-
-	fmt.Println("bbb")
 
 	leader2 := cfg.checkOneLeader()
 	cfg.disconnect(leader2)
