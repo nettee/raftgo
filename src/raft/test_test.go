@@ -643,10 +643,14 @@ func TestPersist3(t *testing.T) {
 	cfg.one(101, 3)
 
 	leader := cfg.checkOneLeader()
+	fmt.Printf("Test: disconnect follower [%d]\n", (leader + 2) % servers)
 	cfg.disconnect((leader + 2) % servers)
 
 	cfg.one(102, 2)
 
+	fmt.Printf("Test: crash and restart leader [%d]\n", (leader + 0) % servers)
+	fmt.Printf("Test: crash follower [%d]\n", (leader + 1) % servers)
+	fmt.Printf("Test: follower [%d] reconnected\n", (leader + 2) % servers)
 	cfg.crash1((leader + 0) % servers)
 	cfg.crash1((leader + 1) % servers)
 	cfg.connect((leader + 2) % servers)
@@ -655,6 +659,7 @@ func TestPersist3(t *testing.T) {
 
 	cfg.one(103, 2)
 
+	fmt.Printf("Test: crash and restart [%d]\n", (leader + 1) % servers)
 	cfg.start1((leader + 1) % servers)
 	cfg.connect((leader + 1) % servers)
 

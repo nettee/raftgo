@@ -434,6 +434,7 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 			rf.currentTerm = reply.Term
 			log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, i)
 			rf.votedFor = -1 // TODO organize re-initialization codes
+			rf.persist()
 			rf.roleTransition(Follower)
 			return
 		}
@@ -533,6 +534,7 @@ func (rf *Raft) increaseTerm() {
 	oldTerm := rf.currentTerm
 	rf.currentTerm++
 	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
+	rf.persist()
 }
 
 func (rf *Raft) roleTransition(newRole Role) {
@@ -600,6 +602,7 @@ func (rf *Raft) runAsCandidate() {
 	// 2. Vote for itself
 	rf.votedFor = rf.me
 	rf.votes = 1
+	rf.persist()
 
 	// 3. Reset election timer
 	timeout := time.After(rf.electionTimeout())
@@ -796,6 +799,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 
 		logEntry := LogEntry{Index: index, Term: rf.currentTerm, Command: command}
 		rf.log = append(rf.log, logEntry)
+		rf.persist()
 
 		log.Printf("append new log entry: %s", logEntry.String())
 	}
