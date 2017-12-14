@@ -151,8 +151,6 @@ type Raft struct {
 	receivedHeartbeat chan bool // Signals that the follower receives a heartbeat
 	grantingVote chan bool // Signals that the follower is granting votes to candidate
 
-	// Volatile states during log replication
-	appliable chan bool // Signals that the server can commit new logs
 }
 
 // return currentTerm and whether this server
@@ -384,7 +382,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 		} else {
 			rf.commitIndex = lastIndex
 		}
-		rf.appliable <- true
+		rf.applyLogs()
 	}
 
 }
@@ -485,11 +483,17 @@ func (rf *Raft) checkCommitted() {
 		log.Printf("[%d] check committed logs after (I.%d): logs until (I.%d) is committed",
 			rf.me, rf.commitIndex, committedIndex)
 		rf.commitIndex = committedIndex
-		rf.appliable <- true
+		rf.applyLogs()
 	} else {
 		log.Printf("[%d] check committed logs after (I.%d): no more logs committed",
 			rf.me, rf.commitIndex)
 	}
+}
+
+func (rf *Raft) applyLogs() {
+	les := rf.log[rf.lastApplied+1:rf.commitIndex+1]
+	go rf.apply(les...)
+	rf.lastApplied = rf.commitIndex
 }
 
 func (rf *Raft) apply(les ...LogEntry) {
@@ -685,24 +689,28 @@ func (rf *Raft) run() {
 	}
 }
 
-func (rf *Raft) waitForCommit() {
-	for {
-		select {
-		case <- rf.appliable:
-			rf.mu.Lock()
-			les := rf.log[rf.lastApplied+1:rf.commitIndex+1]
-			go rf.apply(les...)
-			rf.lastApplied = rf.commitIndex
-
-			//for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
-			//	le := rf.log[i]
-			//	go rf.apply(le)
-			//	rf.lastApplied = i
-			//}
-			rf.mu.Unlock()
-		}
-	}
-}
+//func (rf *Raft) waitForCommit() {
+//
+//	fmt.Println("waitForCommit in")
+//	for {
+//		fmt.Println("waitForCommit for in")
+//		select {
+//		case <- rf.appliable:
+//			rf.mu.Lock()
+//			les := rf.log[rf.lastApplied+1:rf.commitIndex+1]
+//			go rf.apply(les...)
+//			rf.lastApplied = rf.commitIndex
+//
+//			//for i := rf.lastApplied + 1; i <= rf.commitIndex; i++ {
+//			//	le := rf.log[i]
+//			//	go rf.apply(le)
+//			//	rf.lastApplied = i
+//			//}
+//			rf.mu.Unlock()
+//		}
+//		fmt.Println("waitForCommit for done")
+//	}
+//}
 
 //
 // the service or tester wants to create a Raft server. the ports
@@ -747,18 +755,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.majorityVotes = make(chan bool, len(rf.peers)) // The buffer size should be large enough
 	rf.winsElection = false
 
-	rf.appliable = make(chan bool, len(rf.peers))
-
-	fmt.Println("a1")
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
-	fmt.Println("a2")
 
 	go rf.run()
-
-	go rf.waitForCommit()
-
-	fmt.Println("a3")
 
 	return rf
 }
