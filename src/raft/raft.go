@@ -220,8 +220,8 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, args.CandidateId)
-		rf.votedFor = -1
+		log.Printf("[%d] updates its term to (T%d) according to [%d], when handling RequestVote RPC", rf.me, rf.currentTerm, args.CandidateId)
+		rf.roleTransition(Follower)
 	}
 
 	// (Figure2) 2. If votedFor is null(-1) or candidateId, and candidate's
@@ -301,10 +301,10 @@ func (rf *Raft) sendRequestVoteRPC(i int) {
 
 		if reply.Term > rf.currentTerm {
 			rf.currentTerm = reply.Term
-			log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, i)
-			rf.votedFor = -1 // TODO organize re-initialization codes
-			rf.persist()
+			log.Printf("[%d] updates its term to (T%d) according to [%d], after receiving RequestVote RPC reply",
+				rf.me, rf.currentTerm, i)
 			rf.roleTransition(Follower)
+			rf.persist()
 			return
 		}
 
@@ -344,7 +344,8 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, args.LeaderId)
+		log.Printf("[%d] updates its term to (T%d) according to [%d], when handling heartbeat", rf.me, rf.currentTerm, args.LeaderId)
+		rf.roleTransition(Follower)
 	}
 
 	rf.receivedHeartbeat <- true
@@ -444,10 +445,9 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 
 		if reply.Term > rf.currentTerm {
 			rf.currentTerm = reply.Term
-			log.Printf("[%d] updates its term to (T%d) according to [%d]", rf.me, rf.currentTerm, i)
-			rf.votedFor = -1 // TODO organize re-initialization codes
-			rf.persist()
+			log.Printf("[%d] updates its term to (T%d) according to [%d], after receiving heartbeat reply", rf.me, rf.currentTerm, i)
 			rf.roleTransition(Follower)
+			rf.persist()
 			return
 		}
 
@@ -557,6 +557,10 @@ func (rf *Raft) roleTransition(newRole Role) {
 
 	if oldRole == Candidate {
 		rf.winsElection = false // Reset variable
+	}
+
+	if newRole == Follower {
+		rf.votedFor = -1 // Re-initialize state
 	}
 }
 
@@ -805,7 +809,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		// If command received from client: append entry to log,
 		// respond after entry applied to state machine.
 
-		log.Printf("================== COMMAND received from client: {%d}", command)
+		log.Printf("[%d] ================== COMMAND received from client: {%d}", rf.me, command)
 
 		index = rf.getLastLogEntry().Index + 1
 
@@ -813,7 +817,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		rf.log = append(rf.log, logEntry)
 		rf.persist()
 
-		log.Printf("append new log entry: %s", logEntry.String())
+		log.Printf("Leader [%d] append new log entry: %s", rf.me, logEntry.String())
 	}
 
 	return index, term, isLeader

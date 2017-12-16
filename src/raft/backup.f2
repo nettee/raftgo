@@ -1,0 +1,2305 @@
+2017/12/16 10:49:16 [0] :Follower, term = 0
+2017/12/16 10:49:16 [1] :Follower, term = 0
+2017/12/16 10:49:16 [2] :Follower, term = 0
+2017/12/16 10:49:16 [3] :Follower, term = 0
+2017/12/16 10:49:16 [4] :Follower, term = 0
+Test: leader backs up quickly over incorrect follower logs ...
+2017/12/16 10:49:17 Follower [1] election timeout expired
+2017/12/16 10:49:17 [1] Follower->Candidate
+2017/12/16 10:49:17 [1] increase term: 0->1
+2017/12/16 10:49:17 [1]->[4] SEND RequestVote RPC (T1), lastLog = (I.0)(T0)
+2017/12/16 10:49:17 [4] updates its term to (T1) according to [1]
+2017/12/16 10:49:17 [4] votes for [1]
+2017/12/16 10:49:17 [1]<-[4] RECEIVE RequestVote RPC Reply, voteGranted = true
+2017/12/16 10:49:17 [1]->[0] SEND RequestVote RPC (T1), lastLog = (I.0)(T0)
+2017/12/16 10:49:17 [0] updates its term to (T1) according to [1]
+2017/12/16 10:49:17 [0] votes for [1]
+2017/12/16 10:49:17 [1]<-[0] RECEIVE RequestVote RPC Reply, voteGranted = true
+2017/12/16 10:49:17 Candidate [1] wins an election
+2017/12/16 10:49:17 [1] Candidate->Leader
+2017/12/16 10:49:17 [1] check committed logs after (I.0): no more logs committed
+2017/12/16 10:49:17 [1]->[4] SEND heartbeat (T1), prevLog = (I.0,T0)
+2017/12/16 10:49:17 [1]->[2] SEND RequestVote RPC (T1), lastLog = (I.0)(T0)
+2017/12/16 10:49:17 [2] updates its term to (T1) according to [1]
+2017/12/16 10:49:17 [2] votes for [1]
+2017/12/16 10:49:17 [1]<-[2] RECEIVE RequestVote RPC Reply, voteGranted = true
+2017/12/16 10:49:17 [1]->[3] SEND RequestVote RPC (T1), lastLog = (I.0)(T0)
+2017/12/16 10:49:17 [1]->[0] SEND heartbeat (T1), prevLog = (I.0,T0)
+2017/12/16 10:49:17 Follower [4] is granting vote, remains follower
+2017/12/16 10:49:17 Follower [0] is granting vote, remains follower
+2017/12/16 10:49:17 [1]->[3] SEND heartbeat (T1), prevLog = (I.0,T0)
+2017/12/16 10:49:17 [3] updates its term to (T1) according to [1]
+2017/12/16 10:49:17 [1]->[2] SEND heartbeat (T1), prevLog = (I.0,T0)
+2017/12/16 10:49:17 Follower [2] is granting vote, remains follower
+2017/12/16 10:49:17 [3] votes for [1]
+2017/12/16 10:49:17 Follower [3] is granting vote, remains follower
+2017/12/16 10:49:17 [1]<-[3] RECEIVE RequestVote RPC Reply, voteGranted = true
+2017/12/16 10:49:17 ================== COMMAND received from client: {1197333638071922531}
+2017/12/16 10:49:17 Leader [1] append new log entry: <I.1,T1,1197333638071922531>
+2017/12/16 10:49:17 [1] check committed logs after (I.0): no more logs committed
+2017/12/16 10:49:17 [1]->[4] SEND nonempty heartbeat, prevLog = (I.0,T0), entries = (I.1)~(I.1), leaderCommit = 0
+2017/12/16 10:49:17 [1]->[0] SEND nonempty heartbeat, prevLog = (I.0,T0), entries = (I.1)~(I.1), leaderCommit = 0
+2017/12/16 10:49:17 [1]->[2] SEND nonempty heartbeat, prevLog = (I.0,T0), entries = (I.1)~(I.1), leaderCommit = 0
+2017/12/16 10:49:17 [1]->[3] SEND nonempty heartbeat, prevLog = (I.0,T0), entries = (I.1)~(I.1), leaderCommit = 0
+2017/12/16 10:49:17 [4] append 1 log entries, last log (I.1)
+2017/12/16 10:49:17 [0] append 1 log entries, last log (I.1)
+2017/12/16 10:49:17 [2] append 1 log entries, last log (I.1)
+2017/12/16 10:49:17 [1]<-[4] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:17 [1].nextIndex[4]: 1->2, .matchIndex[4]: 0->1
+2017/12/16 10:49:17 [3] append 1 log entries, last log (I.1)
+2017/12/16 10:49:17 [1]<-[2] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:17 [1].nextIndex[2]: 1->2, .matchIndex[2]: 0->1
+2017/12/16 10:49:17 [1]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:17 [1].nextIndex[0]: 1->2, .matchIndex[0]: 0->1
+2017/12/16 10:49:17 [1]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:17 [1].nextIndex[3]: 1->2, .matchIndex[3]: 0->1
+2017/12/16 10:49:17 [1] check committed logs after (I.0): logs until (I.1) is committed
+2017/12/16 10:49:17 [1]->[4] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 APPLY: <I.1,T1,1197333638071922531> by Leader [1]
+2017/12/16 10:49:17 [1]->[0] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[2] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[3] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 APPLY: <I.1,T1,1197333638071922531> by Follower [0]
+2017/12/16 10:49:17 APPLY: <I.1,T1,1197333638071922531> by Follower [2]
+2017/12/16 10:49:17 APPLY: <I.1,T1,1197333638071922531> by Follower [4]
+2017/12/16 10:49:17 APPLY: <I.1,T1,1197333638071922531> by Follower [3]
+2017/12/16 10:49:17 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:17 [1]->[4] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[0] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[2] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[3] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:17 [1]->[4] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[0] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[2] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:17 [1]->[3] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [1]->[4] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [1]->[3] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [1]->[2] SEND heartbeat (T1), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [1]->[0] SEND heartbeat (T1), prevLog = (I.1,T1)
+Test: disconnect followers [3], [4] and [0]
+2017/12/16 10:49:18 ================== COMMAND received from client: {101}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.2,T1,101>
+2017/12/16 10:49:18 ================== COMMAND received from client: {102}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.3,T1,102>
+2017/12/16 10:49:18 ================== COMMAND received from client: {103}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.4,T1,103>
+2017/12/16 10:49:18 ================== COMMAND received from client: {104}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.5,T1,104>
+2017/12/16 10:49:18 ================== COMMAND received from client: {105}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.6,T1,105>
+2017/12/16 10:49:18 ================== COMMAND received from client: {106}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.7,T1,106>
+2017/12/16 10:49:18 ================== COMMAND received from client: {107}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.8,T1,107>
+2017/12/16 10:49:18 ================== COMMAND received from client: {108}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.9,T1,108>
+2017/12/16 10:49:18 ================== COMMAND received from client: {109}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.10,T1,109>
+2017/12/16 10:49:18 ================== COMMAND received from client: {110}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.11,T1,110>
+2017/12/16 10:49:18 ================== COMMAND received from client: {111}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.12,T1,111>
+2017/12/16 10:49:18 ================== COMMAND received from client: {112}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.13,T1,112>
+2017/12/16 10:49:18 ================== COMMAND received from client: {113}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.14,T1,113>
+2017/12/16 10:49:18 ================== COMMAND received from client: {114}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.15,T1,114>
+2017/12/16 10:49:18 ================== COMMAND received from client: {115}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.16,T1,115>
+2017/12/16 10:49:18 ================== COMMAND received from client: {116}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.17,T1,116>
+2017/12/16 10:49:18 ================== COMMAND received from client: {117}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.18,T1,117>
+2017/12/16 10:49:18 ================== COMMAND received from client: {118}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.19,T1,118>
+2017/12/16 10:49:18 ================== COMMAND received from client: {119}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.20,T1,119>
+2017/12/16 10:49:18 ================== COMMAND received from client: {120}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.21,T1,120>
+2017/12/16 10:49:18 ================== COMMAND received from client: {121}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.22,T1,121>
+2017/12/16 10:49:18 ================== COMMAND received from client: {122}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.23,T1,122>
+2017/12/16 10:49:18 ================== COMMAND received from client: {123}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.24,T1,123>
+2017/12/16 10:49:18 ================== COMMAND received from client: {124}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.25,T1,124>
+2017/12/16 10:49:18 ================== COMMAND received from client: {125}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.26,T1,125>
+2017/12/16 10:49:18 ================== COMMAND received from client: {126}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.27,T1,126>
+2017/12/16 10:49:18 ================== COMMAND received from client: {127}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.28,T1,127>
+2017/12/16 10:49:18 ================== COMMAND received from client: {128}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.29,T1,128>
+2017/12/16 10:49:18 ================== COMMAND received from client: {129}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.30,T1,129>
+2017/12/16 10:49:18 ================== COMMAND received from client: {130}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.31,T1,130>
+2017/12/16 10:49:18 ================== COMMAND received from client: {131}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.32,T1,131>
+2017/12/16 10:49:18 ================== COMMAND received from client: {132}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.33,T1,132>
+2017/12/16 10:49:18 ================== COMMAND received from client: {133}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.34,T1,133>
+2017/12/16 10:49:18 ================== COMMAND received from client: {134}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.35,T1,134>
+2017/12/16 10:49:18 ================== COMMAND received from client: {135}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.36,T1,135>
+2017/12/16 10:49:18 ================== COMMAND received from client: {136}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.37,T1,136>
+2017/12/16 10:49:18 ================== COMMAND received from client: {137}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.38,T1,137>
+2017/12/16 10:49:18 ================== COMMAND received from client: {138}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.39,T1,138>
+2017/12/16 10:49:18 ================== COMMAND received from client: {139}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.40,T1,139>
+2017/12/16 10:49:18 ================== COMMAND received from client: {140}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.41,T1,140>
+2017/12/16 10:49:18 ================== COMMAND received from client: {141}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.42,T1,141>
+2017/12/16 10:49:18 ================== COMMAND received from client: {142}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.43,T1,142>
+2017/12/16 10:49:18 ================== COMMAND received from client: {143}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.44,T1,143>
+2017/12/16 10:49:18 ================== COMMAND received from client: {144}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.45,T1,144>
+2017/12/16 10:49:18 ================== COMMAND received from client: {145}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.46,T1,145>
+2017/12/16 10:49:18 ================== COMMAND received from client: {146}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.47,T1,146>
+2017/12/16 10:49:18 ================== COMMAND received from client: {147}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.48,T1,147>
+2017/12/16 10:49:18 ================== COMMAND received from client: {148}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.49,T1,148>
+2017/12/16 10:49:18 ================== COMMAND received from client: {149}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.50,T1,149>
+2017/12/16 10:49:18 ================== COMMAND received from client: {150}
+2017/12/16 10:49:18 Leader [1] append new log entry: <I.51,T1,150>
+2017/12/16 10:49:18 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [2] append 50 log entries, last log (I.51)
+2017/12/16 10:49:18 [1]<-[2] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:18 [1].nextIndex[2]: 2->52, .matchIndex[2]: 1->51
+2017/12/16 10:49:18 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:18 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:18 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+Test: disconnect all servers
+Test: [3], [4] and [0] reconnected
+2017/12/16 10:49:18 Follower [4] election timeout expired
+2017/12/16 10:49:18 [4] Follower->Candidate
+2017/12/16 10:49:18 [4] increase term: 1->2
+2017/12/16 10:49:18 [4]->[3] SEND RequestVote RPC (T2), lastLog = (I.1)(T1)
+2017/12/16 10:49:18 [3] updates its term to (T2) according to [4]
+2017/12/16 10:49:18 [3] votes for [4]
+2017/12/16 10:49:18 [4]<-[3] RECEIVE RequestVote RPC Reply, voteGranted = true
+2017/12/16 10:49:18 [4]->[0] SEND RequestVote RPC (T2), lastLog = (I.1)(T1)
+2017/12/16 10:49:18 [0] updates its term to (T2) according to [4]
+2017/12/16 10:49:18 [0] votes for [4]
+2017/12/16 10:49:18 [4]<-[0] RECEIVE RequestVote RPC Reply, voteGranted = true
+2017/12/16 10:49:18 Candidate [4] wins an election
+2017/12/16 10:49:18 [4] Candidate->Leader
+2017/12/16 10:49:18 [4] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [4]->[3] SEND heartbeat (T2), prevLog = (I.1,T1)
+2017/12/16 10:49:18 Follower [0] is granting vote, remains follower
+2017/12/16 10:49:18 [4]->[1] SEND RequestVote RPC (T2), lastLog = (I.1)(T1)
+2017/12/16 10:49:18 [4]->[2] SEND RequestVote RPC (T2), lastLog = (I.1)(T1)
+2017/12/16 10:49:18 Follower [3] is granting vote, remains follower
+2017/12/16 10:49:18 [4]->[1] SEND heartbeat (T2), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [4]->[0] SEND heartbeat (T2), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [4]->[2] SEND heartbeat (T2), prevLog = (I.1,T1)
+2017/12/16 10:49:18 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:18 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 ================== COMMAND received from client: {201}
+2017/12/16 10:49:18 Leader [4] append new log entry: <I.2,T2,201>
+2017/12/16 10:49:18 [4] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [4]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.2), leaderCommit = 1
+2017/12/16 10:49:18 [4]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.2), leaderCommit = 1
+2017/12/16 10:49:18 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.2), leaderCommit = 1
+2017/12/16 10:49:18 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.2), leaderCommit = 1
+2017/12/16 10:49:18 [3] append 1 log entries, last log (I.2)
+2017/12/16 10:49:18 [0] append 1 log entries, last log (I.2)
+2017/12/16 10:49:18 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:18 [4].nextIndex[3]: 2->3, .matchIndex[3]: 0->2
+2017/12/16 10:49:18 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:18 [4].nextIndex[0]: 2->3, .matchIndex[0]: 0->2
+2017/12/16 10:49:18 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:18 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:18 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:18 [4] check committed logs after (I.1): logs until (I.2) is committed
+2017/12/16 10:49:18 [4]->[3] SEND heartbeat (T2), prevLog = (I.2,T2)
+2017/12/16 10:49:18 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.2), leaderCommit = 2
+2017/12/16 10:49:18 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.2), leaderCommit = 2
+2017/12/16 10:49:18 APPLY: <I.2,T2,201> by Follower [3]
+2017/12/16 10:49:18 APPLY: <I.2,T2,201> by Leader [4]
+2017/12/16 10:49:18 [4]->[0] SEND heartbeat (T2), prevLog = (I.2,T2)
+2017/12/16 10:49:18 APPLY: <I.2,T2,201> by Follower [0]
+2017/12/16 10:49:18 ================== COMMAND received from client: {202}
+2017/12/16 10:49:18 Leader [4] append new log entry: <I.3,T2,202>
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [4] check committed logs after (I.2): no more logs committed
+2017/12/16 10:49:19 [4]->[3] SEND nonempty heartbeat, prevLog = (I.2,T2), entries = (I.3)~(I.3), leaderCommit = 2
+2017/12/16 10:49:19 [3] append 1 log entries, last log (I.3)
+2017/12/16 10:49:19 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:19 [4].nextIndex[3]: 3->4, .matchIndex[3]: 2->3
+2017/12/16 10:49:19 [4]->[0] SEND nonempty heartbeat, prevLog = (I.2,T2), entries = (I.3)~(I.3), leaderCommit = 2
+2017/12/16 10:49:19 [0] append 1 log entries, last log (I.3)
+2017/12/16 10:49:19 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:19 [4].nextIndex[0]: 3->4, .matchIndex[0]: 2->3
+2017/12/16 10:49:19 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.3), leaderCommit = 2
+2017/12/16 10:49:19 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.3), leaderCommit = 2
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [4] check committed logs after (I.2): logs until (I.3) is committed
+2017/12/16 10:49:19 [4]->[3] SEND heartbeat (T2), prevLog = (I.3,T2)
+2017/12/16 10:49:19 APPLY: <I.3,T2,202> by Leader [4]
+2017/12/16 10:49:19 [4]->[0] SEND heartbeat (T2), prevLog = (I.3,T2)
+2017/12/16 10:49:19 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.3), leaderCommit = 3
+2017/12/16 10:49:19 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.3), leaderCommit = 3
+2017/12/16 10:49:19 APPLY: <I.3,T2,202> by Follower [3]
+2017/12/16 10:49:19 APPLY: <I.3,T2,202> by Follower [0]
+2017/12/16 10:49:19 ================== COMMAND received from client: {203}
+2017/12/16 10:49:19 Leader [4] append new log entry: <I.4,T2,203>
+2017/12/16 10:49:19 Follower [2] election timeout expired
+2017/12/16 10:49:19 [2] Follower->Candidate
+2017/12/16 10:49:19 [2] increase term: 1->2
+2017/12/16 10:49:19 [2]->[4] SEND RequestVote RPC (T2), lastLog = (I.51)(T1)
+2017/12/16 10:49:19 [2]->[0] SEND RequestVote RPC (T2), lastLog = (I.51)(T1)
+2017/12/16 10:49:19 [2]->[1] SEND RequestVote RPC (T2), lastLog = (I.51)(T1)
+2017/12/16 10:49:19 [2]->[3] SEND RequestVote RPC (T2), lastLog = (I.51)(T1)
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [4] check committed logs after (I.3): no more logs committed
+2017/12/16 10:49:19 [4]->[3] SEND nonempty heartbeat, prevLog = (I.3,T2), entries = (I.4)~(I.4), leaderCommit = 3
+2017/12/16 10:49:19 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.4), leaderCommit = 3
+2017/12/16 10:49:19 [4]->[0] SEND nonempty heartbeat, prevLog = (I.3,T2), entries = (I.4)~(I.4), leaderCommit = 3
+2017/12/16 10:49:19 [3] append 1 log entries, last log (I.4)
+2017/12/16 10:49:19 [0] append 1 log entries, last log (I.4)
+2017/12/16 10:49:19 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:19 [4].nextIndex[3]: 4->5, .matchIndex[3]: 3->4
+2017/12/16 10:49:19 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.4), leaderCommit = 3
+2017/12/16 10:49:19 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:19 [4].nextIndex[0]: 4->5, .matchIndex[0]: 3->4
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [4] check committed logs after (I.3): logs until (I.4) is committed
+2017/12/16 10:49:19 [4]->[3] SEND heartbeat (T2), prevLog = (I.4,T2)
+2017/12/16 10:49:19 [4]->[0] SEND heartbeat (T2), prevLog = (I.4,T2)
+2017/12/16 10:49:19 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.4), leaderCommit = 4
+2017/12/16 10:49:19 APPLY: <I.4,T2,203> by Leader [4]
+2017/12/16 10:49:19 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.4), leaderCommit = 4
+2017/12/16 10:49:19 APPLY: <I.4,T2,203> by Follower [0]
+2017/12/16 10:49:19 APPLY: <I.4,T2,203> by Follower [3]
+2017/12/16 10:49:19 ================== COMMAND received from client: {204}
+2017/12/16 10:49:19 Leader [4] append new log entry: <I.5,T2,204>
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [4] check committed logs after (I.4): no more logs committed
+2017/12/16 10:49:19 [4]->[3] SEND nonempty heartbeat, prevLog = (I.4,T2), entries = (I.5)~(I.5), leaderCommit = 4
+2017/12/16 10:49:19 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.5), leaderCommit = 4
+2017/12/16 10:49:19 [4]->[0] SEND nonempty heartbeat, prevLog = (I.4,T2), entries = (I.5)~(I.5), leaderCommit = 4
+2017/12/16 10:49:19 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.5), leaderCommit = 4
+2017/12/16 10:49:19 [3] append 1 log entries, last log (I.5)
+2017/12/16 10:49:19 [0] append 1 log entries, last log (I.5)
+2017/12/16 10:49:19 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:19 [4].nextIndex[3]: 5->6, .matchIndex[3]: 4->5
+2017/12/16 10:49:19 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:19 [4].nextIndex[0]: 5->6, .matchIndex[0]: 4->5
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [4] check committed logs after (I.4): logs until (I.5) is committed
+2017/12/16 10:49:19 [4]->[3] SEND heartbeat (T2), prevLog = (I.5,T2)
+2017/12/16 10:49:19 APPLY: <I.5,T2,204> by Leader [4]
+2017/12/16 10:49:19 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.5), leaderCommit = 5
+2017/12/16 10:49:19 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.5), leaderCommit = 5
+2017/12/16 10:49:19 [4]->[0] SEND heartbeat (T2), prevLog = (I.5,T2)
+2017/12/16 10:49:19 APPLY: <I.5,T2,204> by Follower [3]
+2017/12/16 10:49:19 APPLY: <I.5,T2,204> by Follower [0]
+2017/12/16 10:49:19 ================== COMMAND received from client: {205}
+2017/12/16 10:49:19 Leader [4] append new log entry: <I.6,T2,205>
+2017/12/16 10:49:19 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:19 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:19 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:19 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [4] check committed logs after (I.5): no more logs committed
+2017/12/16 10:49:20 [4]->[3] SEND nonempty heartbeat, prevLog = (I.5,T2), entries = (I.6)~(I.6), leaderCommit = 5
+2017/12/16 10:49:20 [4]->[0] SEND nonempty heartbeat, prevLog = (I.5,T2), entries = (I.6)~(I.6), leaderCommit = 5
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.6), leaderCommit = 5
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.6), leaderCommit = 5
+2017/12/16 10:49:20 [3] append 1 log entries, last log (I.6)
+2017/12/16 10:49:20 [0] append 1 log entries, last log (I.6)
+2017/12/16 10:49:20 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[3]: 6->7, .matchIndex[3]: 5->6
+2017/12/16 10:49:20 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[0]: 6->7, .matchIndex[0]: 5->6
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 Candidate [2] election timeout elapses
+2017/12/16 10:49:20 [2] Candidate->Candidate
+2017/12/16 10:49:20 [2] increase term: 2->3
+2017/12/16 10:49:20 [2]->[4] SEND RequestVote RPC (T3), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [2]->[1] SEND RequestVote RPC (T3), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [2]->[3] SEND RequestVote RPC (T3), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [2]->[0] SEND RequestVote RPC (T3), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [4] check committed logs after (I.5): logs until (I.6) is committed
+2017/12/16 10:49:20 [4]->[0] SEND heartbeat (T2), prevLog = (I.6,T2)
+2017/12/16 10:49:20 [4]->[3] SEND heartbeat (T2), prevLog = (I.6,T2)
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.6), leaderCommit = 6
+2017/12/16 10:49:20 APPLY: <I.6,T2,205> by Leader [4]
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.6), leaderCommit = 6
+2017/12/16 10:49:20 APPLY: <I.6,T2,205> by Follower [0]
+2017/12/16 10:49:20 APPLY: <I.6,T2,205> by Follower [3]
+2017/12/16 10:49:20 ================== COMMAND received from client: {206}
+2017/12/16 10:49:20 Leader [4] append new log entry: <I.7,T2,206>
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [4] check committed logs after (I.6): no more logs committed
+2017/12/16 10:49:20 [4]->[3] SEND nonempty heartbeat, prevLog = (I.6,T2), entries = (I.7)~(I.7), leaderCommit = 6
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.7), leaderCommit = 6
+2017/12/16 10:49:20 [4]->[0] SEND nonempty heartbeat, prevLog = (I.6,T2), entries = (I.7)~(I.7), leaderCommit = 6
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.7), leaderCommit = 6
+2017/12/16 10:49:20 [3] append 1 log entries, last log (I.7)
+2017/12/16 10:49:20 [0] append 1 log entries, last log (I.7)
+2017/12/16 10:49:20 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[3]: 7->8, .matchIndex[3]: 6->7
+2017/12/16 10:49:20 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[0]: 7->8, .matchIndex[0]: 6->7
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [4] check committed logs after (I.6): logs until (I.7) is committed
+2017/12/16 10:49:20 [4]->[0] SEND heartbeat (T2), prevLog = (I.7,T2)
+2017/12/16 10:49:20 APPLY: <I.7,T2,206> by Leader [4]
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.7), leaderCommit = 7
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.7), leaderCommit = 7
+2017/12/16 10:49:20 [4]->[3] SEND heartbeat (T2), prevLog = (I.7,T2)
+2017/12/16 10:49:20 APPLY: <I.7,T2,206> by Follower [0]
+2017/12/16 10:49:20 APPLY: <I.7,T2,206> by Follower [3]
+2017/12/16 10:49:20 ================== COMMAND received from client: {207}
+2017/12/16 10:49:20 Leader [4] append new log entry: <I.8,T2,207>
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [4] check committed logs after (I.7): no more logs committed
+2017/12/16 10:49:20 [4]->[3] SEND nonempty heartbeat, prevLog = (I.7,T2), entries = (I.8)~(I.8), leaderCommit = 7
+2017/12/16 10:49:20 [4]->[0] SEND nonempty heartbeat, prevLog = (I.7,T2), entries = (I.8)~(I.8), leaderCommit = 7
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.8), leaderCommit = 7
+2017/12/16 10:49:20 [0] append 1 log entries, last log (I.8)
+2017/12/16 10:49:20 [3] append 1 log entries, last log (I.8)
+2017/12/16 10:49:20 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[3]: 8->9, .matchIndex[3]: 7->8
+2017/12/16 10:49:20 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[0]: 8->9, .matchIndex[0]: 7->8
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.8), leaderCommit = 7
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [4] check committed logs after (I.7): logs until (I.8) is committed
+2017/12/16 10:49:20 [4]->[3] SEND heartbeat (T2), prevLog = (I.8,T2)
+2017/12/16 10:49:20 [4]->[0] SEND heartbeat (T2), prevLog = (I.8,T2)
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.8), leaderCommit = 8
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.8), leaderCommit = 8
+2017/12/16 10:49:20 APPLY: <I.8,T2,207> by Leader [4]
+2017/12/16 10:49:20 APPLY: <I.8,T2,207> by Follower [3]
+2017/12/16 10:49:20 APPLY: <I.8,T2,207> by Follower [0]
+2017/12/16 10:49:20 ================== COMMAND received from client: {208}
+2017/12/16 10:49:20 Leader [4] append new log entry: <I.9,T2,208>
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 Candidate [2] election timeout elapses
+2017/12/16 10:49:20 [2] Candidate->Candidate
+2017/12/16 10:49:20 [2] increase term: 3->4
+2017/12/16 10:49:20 [2]->[4] SEND RequestVote RPC (T4), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [2]->[0] SEND RequestVote RPC (T4), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [2]->[1] SEND RequestVote RPC (T4), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [2]->[3] SEND RequestVote RPC (T4), lastLog = (I.51)(T1)
+2017/12/16 10:49:20 [4] check committed logs after (I.8): no more logs committed
+2017/12/16 10:49:20 [4]->[3] SEND nonempty heartbeat, prevLog = (I.8,T2), entries = (I.9)~(I.9), leaderCommit = 8
+2017/12/16 10:49:20 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.9), leaderCommit = 8
+2017/12/16 10:49:20 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.9), leaderCommit = 8
+2017/12/16 10:49:20 [4]->[0] SEND nonempty heartbeat, prevLog = (I.8,T2), entries = (I.9)~(I.9), leaderCommit = 8
+2017/12/16 10:49:20 [3] append 1 log entries, last log (I.9)
+2017/12/16 10:49:20 [0] append 1 log entries, last log (I.9)
+2017/12/16 10:49:20 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[3]: 9->10, .matchIndex[3]: 8->9
+2017/12/16 10:49:20 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:20 [4].nextIndex[0]: 9->10, .matchIndex[0]: 8->9
+2017/12/16 10:49:20 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:20 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:20 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:20 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.8): logs until (I.9) is committed
+2017/12/16 10:49:21 [4]->[3] SEND heartbeat (T2), prevLog = (I.9,T2)
+2017/12/16 10:49:21 [4]->[0] SEND heartbeat (T2), prevLog = (I.9,T2)
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.9), leaderCommit = 9
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.9), leaderCommit = 9
+2017/12/16 10:49:21 APPLY: <I.9,T2,208> by Leader [4]
+2017/12/16 10:49:21 APPLY: <I.9,T2,208> by Follower [0]
+2017/12/16 10:49:21 APPLY: <I.9,T2,208> by Follower [3]
+2017/12/16 10:49:21 ================== COMMAND received from client: {209}
+2017/12/16 10:49:21 Leader [4] append new log entry: <I.10,T2,209>
+2017/12/16 10:49:21 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:21 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:21 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.9): no more logs committed
+2017/12/16 10:49:21 [4]->[3] SEND nonempty heartbeat, prevLog = (I.9,T2), entries = (I.10)~(I.10), leaderCommit = 9
+2017/12/16 10:49:21 [3] append 1 log entries, last log (I.10)
+2017/12/16 10:49:21 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:21 [4].nextIndex[3]: 10->11, .matchIndex[3]: 9->10
+2017/12/16 10:49:21 [4]->[0] SEND nonempty heartbeat, prevLog = (I.9,T2), entries = (I.10)~(I.10), leaderCommit = 9
+2017/12/16 10:49:21 [0] append 1 log entries, last log (I.10)
+2017/12/16 10:49:21 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:21 [4].nextIndex[0]: 10->11, .matchIndex[0]: 9->10
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.10), leaderCommit = 9
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.10), leaderCommit = 9
+2017/12/16 10:49:21 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:21 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:21 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.9): logs until (I.10) is committed
+2017/12/16 10:49:21 [4]->[3] SEND heartbeat (T2), prevLog = (I.10,T2)
+2017/12/16 10:49:21 APPLY: <I.10,T2,209> by Leader [4]
+2017/12/16 10:49:21 [4]->[0] SEND heartbeat (T2), prevLog = (I.10,T2)
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.10), leaderCommit = 10
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.10), leaderCommit = 10
+2017/12/16 10:49:21 APPLY: <I.10,T2,209> by Follower [3]
+2017/12/16 10:49:21 APPLY: <I.10,T2,209> by Follower [0]
+2017/12/16 10:49:21 Candidate [2] election timeout elapses
+2017/12/16 10:49:21 [2] Candidate->Candidate
+2017/12/16 10:49:21 [2] increase term: 4->5
+2017/12/16 10:49:21 [2]->[4] SEND RequestVote RPC (T5), lastLog = (I.51)(T1)
+2017/12/16 10:49:21 [2]->[0] SEND RequestVote RPC (T5), lastLog = (I.51)(T1)
+2017/12/16 10:49:21 [2]->[1] SEND RequestVote RPC (T5), lastLog = (I.51)(T1)
+2017/12/16 10:49:21 [2]->[3] SEND RequestVote RPC (T5), lastLog = (I.51)(T1)
+2017/12/16 10:49:21 ================== COMMAND received from client: {210}
+2017/12/16 10:49:21 Leader [4] append new log entry: <I.11,T2,210>
+2017/12/16 10:49:21 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:21 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:21 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.10): no more logs committed
+2017/12/16 10:49:21 [4]->[3] SEND nonempty heartbeat, prevLog = (I.10,T2), entries = (I.11)~(I.11), leaderCommit = 10
+2017/12/16 10:49:21 [4]->[0] SEND nonempty heartbeat, prevLog = (I.10,T2), entries = (I.11)~(I.11), leaderCommit = 10
+2017/12/16 10:49:21 [0] append 1 log entries, last log (I.11)
+2017/12/16 10:49:21 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:21 [4].nextIndex[0]: 11->12, .matchIndex[0]: 10->11
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.11), leaderCommit = 10
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.11), leaderCommit = 10
+2017/12/16 10:49:21 [3] append 1 log entries, last log (I.11)
+2017/12/16 10:49:21 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:21 [4].nextIndex[3]: 11->12, .matchIndex[3]: 10->11
+2017/12/16 10:49:21 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:21 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:21 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.10): logs until (I.11) is committed
+2017/12/16 10:49:21 [4]->[3] SEND heartbeat (T2), prevLog = (I.11,T2)
+2017/12/16 10:49:21 [4]->[0] SEND heartbeat (T2), prevLog = (I.11,T2)
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.11), leaderCommit = 11
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.11), leaderCommit = 11
+2017/12/16 10:49:21 APPLY: <I.11,T2,210> by Leader [4]
+2017/12/16 10:49:21 APPLY: <I.11,T2,210> by Follower [0]
+2017/12/16 10:49:21 APPLY: <I.11,T2,210> by Follower [3]
+2017/12/16 10:49:21 ================== COMMAND received from client: {211}
+2017/12/16 10:49:21 Leader [4] append new log entry: <I.12,T2,211>
+2017/12/16 10:49:21 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:21 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:21 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.11): no more logs committed
+2017/12/16 10:49:21 [4]->[3] SEND nonempty heartbeat, prevLog = (I.11,T2), entries = (I.12)~(I.12), leaderCommit = 11
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.12), leaderCommit = 11
+2017/12/16 10:49:21 [4]->[0] SEND nonempty heartbeat, prevLog = (I.11,T2), entries = (I.12)~(I.12), leaderCommit = 11
+2017/12/16 10:49:21 [3] append 1 log entries, last log (I.12)
+2017/12/16 10:49:21 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:21 [4].nextIndex[3]: 12->13, .matchIndex[3]: 11->12
+2017/12/16 10:49:21 [0] append 1 log entries, last log (I.12)
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.12), leaderCommit = 11
+2017/12/16 10:49:21 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:21 [4].nextIndex[0]: 12->13, .matchIndex[0]: 11->12
+2017/12/16 10:49:21 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:21 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:21 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:21 [4] check committed logs after (I.11): logs until (I.12) is committed
+2017/12/16 10:49:21 [4]->[3] SEND heartbeat (T2), prevLog = (I.12,T2)
+2017/12/16 10:49:21 [4]->[0] SEND heartbeat (T2), prevLog = (I.12,T2)
+2017/12/16 10:49:21 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.12), leaderCommit = 12
+2017/12/16 10:49:21 APPLY: <I.12,T2,211> by Leader [4]
+2017/12/16 10:49:21 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.12), leaderCommit = 12
+2017/12/16 10:49:21 APPLY: <I.12,T2,211> by Follower [3]
+2017/12/16 10:49:21 APPLY: <I.12,T2,211> by Follower [0]
+2017/12/16 10:49:22 ================== COMMAND received from client: {212}
+2017/12/16 10:49:22 Leader [4] append new log entry: <I.13,T2,212>
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 Candidate [2] election timeout elapses
+2017/12/16 10:49:22 [2] Candidate->Candidate
+2017/12/16 10:49:22 [2] increase term: 5->6
+2017/12/16 10:49:22 [2]->[4] SEND RequestVote RPC (T6), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [2]->[0] SEND RequestVote RPC (T6), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [2]->[1] SEND RequestVote RPC (T6), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [2]->[3] SEND RequestVote RPC (T6), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [4] check committed logs after (I.12): no more logs committed
+2017/12/16 10:49:22 [4]->[3] SEND nonempty heartbeat, prevLog = (I.12,T2), entries = (I.13)~(I.13), leaderCommit = 12
+2017/12/16 10:49:22 [3] append 1 log entries, last log (I.13)
+2017/12/16 10:49:22 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:22 [4].nextIndex[3]: 13->14, .matchIndex[3]: 12->13
+2017/12/16 10:49:22 [4]->[0] SEND nonempty heartbeat, prevLog = (I.12,T2), entries = (I.13)~(I.13), leaderCommit = 12
+2017/12/16 10:49:22 [0] append 1 log entries, last log (I.13)
+2017/12/16 10:49:22 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:22 [4].nextIndex[0]: 13->14, .matchIndex[0]: 12->13
+2017/12/16 10:49:22 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.13), leaderCommit = 12
+2017/12/16 10:49:22 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.13), leaderCommit = 12
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [4] check committed logs after (I.12): logs until (I.13) is committed
+2017/12/16 10:49:22 [4]->[3] SEND heartbeat (T2), prevLog = (I.13,T2)
+2017/12/16 10:49:22 [4]->[0] SEND heartbeat (T2), prevLog = (I.13,T2)
+2017/12/16 10:49:22 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.13), leaderCommit = 13
+2017/12/16 10:49:22 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.13), leaderCommit = 13
+2017/12/16 10:49:22 APPLY: <I.13,T2,212> by Leader [4]
+2017/12/16 10:49:22 APPLY: <I.13,T2,212> by Follower [3]
+2017/12/16 10:49:22 APPLY: <I.13,T2,212> by Follower [0]
+2017/12/16 10:49:22 ================== COMMAND received from client: {213}
+2017/12/16 10:49:22 Leader [4] append new log entry: <I.14,T2,213>
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [4] check committed logs after (I.13): no more logs committed
+2017/12/16 10:49:22 [4]->[3] SEND nonempty heartbeat, prevLog = (I.13,T2), entries = (I.14)~(I.14), leaderCommit = 13
+2017/12/16 10:49:22 [3] append 1 log entries, last log (I.14)
+2017/12/16 10:49:22 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:22 [4].nextIndex[3]: 14->15, .matchIndex[3]: 13->14
+2017/12/16 10:49:22 [4]->[0] SEND nonempty heartbeat, prevLog = (I.13,T2), entries = (I.14)~(I.14), leaderCommit = 13
+2017/12/16 10:49:22 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.14), leaderCommit = 13
+2017/12/16 10:49:22 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.14), leaderCommit = 13
+2017/12/16 10:49:22 [0] append 1 log entries, last log (I.14)
+2017/12/16 10:49:22 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:22 [4].nextIndex[0]: 14->15, .matchIndex[0]: 13->14
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [4] check committed logs after (I.13): logs until (I.14) is committed
+2017/12/16 10:49:22 [4]->[0] SEND heartbeat (T2), prevLog = (I.14,T2)
+2017/12/16 10:49:22 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.14), leaderCommit = 14
+2017/12/16 10:49:22 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.14), leaderCommit = 14
+2017/12/16 10:49:22 APPLY: <I.14,T2,213> by Leader [4]
+2017/12/16 10:49:22 [4]->[3] SEND heartbeat (T2), prevLog = (I.14,T2)
+2017/12/16 10:49:22 APPLY: <I.14,T2,213> by Follower [0]
+2017/12/16 10:49:22 APPLY: <I.14,T2,213> by Follower [3]
+2017/12/16 10:49:22 ================== COMMAND received from client: {214}
+2017/12/16 10:49:22 Leader [4] append new log entry: <I.15,T2,214>
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [4] check committed logs after (I.14): no more logs committed
+2017/12/16 10:49:22 [4]->[3] SEND nonempty heartbeat, prevLog = (I.14,T2), entries = (I.15)~(I.15), leaderCommit = 14
+2017/12/16 10:49:22 [3] append 1 log entries, last log (I.15)
+2017/12/16 10:49:22 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:22 [4].nextIndex[3]: 15->16, .matchIndex[3]: 14->15
+2017/12/16 10:49:22 [4]->[0] SEND nonempty heartbeat, prevLog = (I.14,T2), entries = (I.15)~(I.15), leaderCommit = 14
+2017/12/16 10:49:22 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.15), leaderCommit = 14
+2017/12/16 10:49:22 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.15), leaderCommit = 14
+2017/12/16 10:49:22 [0] append 1 log entries, last log (I.15)
+2017/12/16 10:49:22 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:22 [4].nextIndex[0]: 15->16, .matchIndex[0]: 14->15
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 Candidate [2] election timeout elapses
+2017/12/16 10:49:22 [2] Candidate->Candidate
+2017/12/16 10:49:22 [2] increase term: 6->7
+2017/12/16 10:49:22 [2]->[4] SEND RequestVote RPC (T7), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [2]->[1] SEND RequestVote RPC (T7), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [2]->[3] SEND RequestVote RPC (T7), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [2]->[0] SEND RequestVote RPC (T7), lastLog = (I.51)(T1)
+2017/12/16 10:49:22 [4] check committed logs after (I.14): logs until (I.15) is committed
+2017/12/16 10:49:22 [4]->[3] SEND heartbeat (T2), prevLog = (I.15,T2)
+2017/12/16 10:49:22 [4]->[0] SEND heartbeat (T2), prevLog = (I.15,T2)
+2017/12/16 10:49:22 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.15), leaderCommit = 15
+2017/12/16 10:49:22 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.15), leaderCommit = 15
+2017/12/16 10:49:22 APPLY: <I.15,T2,214> by Leader [4]
+2017/12/16 10:49:22 APPLY: <I.15,T2,214> by Follower [3]
+2017/12/16 10:49:22 APPLY: <I.15,T2,214> by Follower [0]
+2017/12/16 10:49:22 ================== COMMAND received from client: {215}
+2017/12/16 10:49:22 Leader [4] append new log entry: <I.16,T2,215>
+2017/12/16 10:49:22 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:22 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:22 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:22 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [4] check committed logs after (I.15): no more logs committed
+2017/12/16 10:49:23 [4]->[3] SEND nonempty heartbeat, prevLog = (I.15,T2), entries = (I.16)~(I.16), leaderCommit = 15
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.16), leaderCommit = 15
+2017/12/16 10:49:23 [4]->[0] SEND nonempty heartbeat, prevLog = (I.15,T2), entries = (I.16)~(I.16), leaderCommit = 15
+2017/12/16 10:49:23 [3] append 1 log entries, last log (I.16)
+2017/12/16 10:49:23 [0] append 1 log entries, last log (I.16)
+2017/12/16 10:49:23 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[3]: 16->17, .matchIndex[3]: 15->16
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.16), leaderCommit = 15
+2017/12/16 10:49:23 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[0]: 16->17, .matchIndex[0]: 15->16
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [4] check committed logs after (I.15): logs until (I.16) is committed
+2017/12/16 10:49:23 [4]->[3] SEND heartbeat (T2), prevLog = (I.16,T2)
+2017/12/16 10:49:23 APPLY: <I.16,T2,215> by Leader [4]
+2017/12/16 10:49:23 [4]->[0] SEND heartbeat (T2), prevLog = (I.16,T2)
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.16), leaderCommit = 16
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.16), leaderCommit = 16
+2017/12/16 10:49:23 APPLY: <I.16,T2,215> by Follower [3]
+2017/12/16 10:49:23 APPLY: <I.16,T2,215> by Follower [0]
+2017/12/16 10:49:23 ================== COMMAND received from client: {216}
+2017/12/16 10:49:23 Leader [4] append new log entry: <I.17,T2,216>
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [4] check committed logs after (I.16): no more logs committed
+2017/12/16 10:49:23 [4]->[3] SEND nonempty heartbeat, prevLog = (I.16,T2), entries = (I.17)~(I.17), leaderCommit = 16
+2017/12/16 10:49:23 [3] append 1 log entries, last log (I.17)
+2017/12/16 10:49:23 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[3]: 17->18, .matchIndex[3]: 16->17
+2017/12/16 10:49:23 [4]->[0] SEND nonempty heartbeat, prevLog = (I.16,T2), entries = (I.17)~(I.17), leaderCommit = 16
+2017/12/16 10:49:23 [0] append 1 log entries, last log (I.17)
+2017/12/16 10:49:23 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[0]: 17->18, .matchIndex[0]: 16->17
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.17), leaderCommit = 16
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.17), leaderCommit = 16
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [4] check committed logs after (I.16): logs until (I.17) is committed
+2017/12/16 10:49:23 [4]->[3] SEND heartbeat (T2), prevLog = (I.17,T2)
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.17), leaderCommit = 17
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.17), leaderCommit = 17
+2017/12/16 10:49:23 APPLY: <I.17,T2,216> by Leader [4]
+2017/12/16 10:49:23 [4]->[0] SEND heartbeat (T2), prevLog = (I.17,T2)
+2017/12/16 10:49:23 APPLY: <I.17,T2,216> by Follower [3]
+2017/12/16 10:49:23 APPLY: <I.17,T2,216> by Follower [0]
+2017/12/16 10:49:23 ================== COMMAND received from client: {217}
+2017/12/16 10:49:23 Leader [4] append new log entry: <I.18,T2,217>
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 Candidate [2] election timeout elapses
+2017/12/16 10:49:23 [2] Candidate->Candidate
+2017/12/16 10:49:23 [2] increase term: 7->8
+2017/12/16 10:49:23 [2]->[4] SEND RequestVote RPC (T8), lastLog = (I.51)(T1)
+2017/12/16 10:49:23 [2]->[0] SEND RequestVote RPC (T8), lastLog = (I.51)(T1)
+2017/12/16 10:49:23 [2]->[3] SEND RequestVote RPC (T8), lastLog = (I.51)(T1)
+2017/12/16 10:49:23 [2]->[1] SEND RequestVote RPC (T8), lastLog = (I.51)(T1)
+2017/12/16 10:49:23 [4] check committed logs after (I.17): no more logs committed
+2017/12/16 10:49:23 [4]->[3] SEND nonempty heartbeat, prevLog = (I.17,T2), entries = (I.18)~(I.18), leaderCommit = 17
+2017/12/16 10:49:23 [3] append 1 log entries, last log (I.18)
+2017/12/16 10:49:23 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[3]: 18->19, .matchIndex[3]: 17->18
+2017/12/16 10:49:23 [4]->[0] SEND nonempty heartbeat, prevLog = (I.17,T2), entries = (I.18)~(I.18), leaderCommit = 17
+2017/12/16 10:49:23 [0] append 1 log entries, last log (I.18)
+2017/12/16 10:49:23 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[0]: 18->19, .matchIndex[0]: 17->18
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.18), leaderCommit = 17
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.18), leaderCommit = 17
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [4] check committed logs after (I.17): logs until (I.18) is committed
+2017/12/16 10:49:23 [4]->[3] SEND heartbeat (T2), prevLog = (I.18,T2)
+2017/12/16 10:49:23 APPLY: <I.18,T2,217> by Leader [4]
+2017/12/16 10:49:23 [4]->[0] SEND heartbeat (T2), prevLog = (I.18,T2)
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.18), leaderCommit = 18
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.18), leaderCommit = 18
+2017/12/16 10:49:23 APPLY: <I.18,T2,217> by Follower [3]
+2017/12/16 10:49:23 APPLY: <I.18,T2,217> by Follower [0]
+2017/12/16 10:49:23 ================== COMMAND received from client: {218}
+2017/12/16 10:49:23 Leader [4] append new log entry: <I.19,T2,218>
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [4] check committed logs after (I.18): no more logs committed
+2017/12/16 10:49:23 [4]->[3] SEND nonempty heartbeat, prevLog = (I.18,T2), entries = (I.19)~(I.19), leaderCommit = 18
+2017/12/16 10:49:23 [3] append 1 log entries, last log (I.19)
+2017/12/16 10:49:23 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[3]: 19->20, .matchIndex[3]: 18->19
+2017/12/16 10:49:23 [4]->[0] SEND nonempty heartbeat, prevLog = (I.18,T2), entries = (I.19)~(I.19), leaderCommit = 18
+2017/12/16 10:49:23 [0] append 1 log entries, last log (I.19)
+2017/12/16 10:49:23 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:23 [4].nextIndex[0]: 19->20, .matchIndex[0]: 18->19
+2017/12/16 10:49:23 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.19), leaderCommit = 18
+2017/12/16 10:49:23 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.19), leaderCommit = 18
+2017/12/16 10:49:23 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:23 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:23 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:23 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [4] check committed logs after (I.18): logs until (I.19) is committed
+2017/12/16 10:49:24 [4]->[3] SEND heartbeat (T2), prevLog = (I.19,T2)
+2017/12/16 10:49:24 APPLY: <I.19,T2,218> by Leader [4]
+2017/12/16 10:49:24 [4]->[0] SEND heartbeat (T2), prevLog = (I.19,T2)
+2017/12/16 10:49:24 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.19), leaderCommit = 19
+2017/12/16 10:49:24 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.19), leaderCommit = 19
+2017/12/16 10:49:24 APPLY: <I.19,T2,218> by Follower [3]
+2017/12/16 10:49:24 APPLY: <I.19,T2,218> by Follower [0]
+2017/12/16 10:49:24 ================== COMMAND received from client: {219}
+2017/12/16 10:49:24 Leader [4] append new log entry: <I.20,T2,219>
+2017/12/16 10:49:24 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:24 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:24 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [4] check committed logs after (I.19): no more logs committed
+2017/12/16 10:49:24 [4]->[3] SEND nonempty heartbeat, prevLog = (I.19,T2), entries = (I.20)~(I.20), leaderCommit = 19
+2017/12/16 10:49:24 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.20), leaderCommit = 19
+2017/12/16 10:49:24 [4]->[0] SEND nonempty heartbeat, prevLog = (I.19,T2), entries = (I.20)~(I.20), leaderCommit = 19
+2017/12/16 10:49:24 [3] append 1 log entries, last log (I.20)
+2017/12/16 10:49:24 [0] append 1 log entries, last log (I.20)
+2017/12/16 10:49:24 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:24 [4].nextIndex[3]: 20->21, .matchIndex[3]: 19->20
+2017/12/16 10:49:24 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.20), leaderCommit = 19
+2017/12/16 10:49:24 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:24 [4].nextIndex[0]: 20->21, .matchIndex[0]: 19->20
+2017/12/16 10:49:24 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:24 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:24 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 Candidate [2] election timeout elapses
+2017/12/16 10:49:24 [2] Candidate->Candidate
+2017/12/16 10:49:24 [2] increase term: 8->9
+2017/12/16 10:49:24 [2]->[4] SEND RequestVote RPC (T9), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [2]->[1] SEND RequestVote RPC (T9), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [2]->[3] SEND RequestVote RPC (T9), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [2]->[0] SEND RequestVote RPC (T9), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [4] check committed logs after (I.19): logs until (I.20) is committed
+2017/12/16 10:49:24 APPLY: <I.20,T2,219> by Leader [4]
+2017/12/16 10:49:24 [4]->[0] SEND heartbeat (T2), prevLog = (I.20,T2)
+2017/12/16 10:49:24 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.20), leaderCommit = 20
+2017/12/16 10:49:24 [4]->[3] SEND heartbeat (T2), prevLog = (I.20,T2)
+2017/12/16 10:49:24 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.20), leaderCommit = 20
+2017/12/16 10:49:24 APPLY: <I.20,T2,219> by Follower [0]
+2017/12/16 10:49:24 APPLY: <I.20,T2,219> by Follower [3]
+2017/12/16 10:49:24 ================== COMMAND received from client: {220}
+2017/12/16 10:49:24 Leader [4] append new log entry: <I.21,T2,220>
+2017/12/16 10:49:24 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:24 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:24 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [4] check committed logs after (I.20): no more logs committed
+2017/12/16 10:49:24 [4]->[3] SEND nonempty heartbeat, prevLog = (I.20,T2), entries = (I.21)~(I.21), leaderCommit = 20
+2017/12/16 10:49:24 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.21), leaderCommit = 20
+2017/12/16 10:49:24 [4]->[0] SEND nonempty heartbeat, prevLog = (I.20,T2), entries = (I.21)~(I.21), leaderCommit = 20
+2017/12/16 10:49:24 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.21), leaderCommit = 20
+2017/12/16 10:49:24 [3] append 1 log entries, last log (I.21)
+2017/12/16 10:49:24 [0] append 1 log entries, last log (I.21)
+2017/12/16 10:49:24 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:24 [4].nextIndex[3]: 21->22, .matchIndex[3]: 20->21
+2017/12/16 10:49:24 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:24 [4].nextIndex[0]: 21->22, .matchIndex[0]: 20->21
+2017/12/16 10:49:24 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:24 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:24 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [4] check committed logs after (I.20): logs until (I.21) is committed
+2017/12/16 10:49:24 [4]->[3] SEND heartbeat (T2), prevLog = (I.21,T2)
+2017/12/16 10:49:24 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.21), leaderCommit = 21
+2017/12/16 10:49:24 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.21), leaderCommit = 21
+2017/12/16 10:49:24 APPLY: <I.21,T2,220> by Leader [4]
+2017/12/16 10:49:24 [4]->[0] SEND heartbeat (T2), prevLog = (I.21,T2)
+2017/12/16 10:49:24 APPLY: <I.21,T2,220> by Follower [3]
+2017/12/16 10:49:24 APPLY: <I.21,T2,220> by Follower [0]
+2017/12/16 10:49:24 ================== COMMAND received from client: {221}
+2017/12/16 10:49:24 Leader [4] append new log entry: <I.22,T2,221>
+2017/12/16 10:49:24 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:24 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:24 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [4] check committed logs after (I.21): no more logs committed
+2017/12/16 10:49:24 [4]->[3] SEND nonempty heartbeat, prevLog = (I.21,T2), entries = (I.22)~(I.22), leaderCommit = 21
+2017/12/16 10:49:24 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.22), leaderCommit = 21
+2017/12/16 10:49:24 [4]->[0] SEND nonempty heartbeat, prevLog = (I.21,T2), entries = (I.22)~(I.22), leaderCommit = 21
+2017/12/16 10:49:24 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.22), leaderCommit = 21
+2017/12/16 10:49:24 [3] append 1 log entries, last log (I.22)
+2017/12/16 10:49:24 [0] append 1 log entries, last log (I.22)
+2017/12/16 10:49:24 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:24 [4].nextIndex[3]: 22->23, .matchIndex[3]: 21->22
+2017/12/16 10:49:24 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:24 [4].nextIndex[0]: 22->23, .matchIndex[0]: 21->22
+2017/12/16 10:49:24 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:24 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:24 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:24 Candidate [2] election timeout elapses
+2017/12/16 10:49:24 [2] Candidate->Candidate
+2017/12/16 10:49:24 [2] increase term: 9->10
+2017/12/16 10:49:24 [2]->[4] SEND RequestVote RPC (T10), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [2]->[1] SEND RequestVote RPC (T10), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [2]->[3] SEND RequestVote RPC (T10), lastLog = (I.51)(T1)
+2017/12/16 10:49:24 [2]->[0] SEND RequestVote RPC (T10), lastLog = (I.51)(T1)
+2017/12/16 10:49:25 [4] check committed logs after (I.21): logs until (I.22) is committed
+2017/12/16 10:49:25 [4]->[0] SEND heartbeat (T2), prevLog = (I.22,T2)
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.22), leaderCommit = 22
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.22), leaderCommit = 22
+2017/12/16 10:49:25 APPLY: <I.22,T2,221> by Leader [4]
+2017/12/16 10:49:25 [4]->[3] SEND heartbeat (T2), prevLog = (I.22,T2)
+2017/12/16 10:49:25 APPLY: <I.22,T2,221> by Follower [0]
+2017/12/16 10:49:25 APPLY: <I.22,T2,221> by Follower [3]
+2017/12/16 10:49:25 ================== COMMAND received from client: {222}
+2017/12/16 10:49:25 Leader [4] append new log entry: <I.23,T2,222>
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:25 [4] check committed logs after (I.22): no more logs committed
+2017/12/16 10:49:25 [4]->[3] SEND nonempty heartbeat, prevLog = (I.22,T2), entries = (I.23)~(I.23), leaderCommit = 22
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.23), leaderCommit = 22
+2017/12/16 10:49:25 [4]->[0] SEND nonempty heartbeat, prevLog = (I.22,T2), entries = (I.23)~(I.23), leaderCommit = 22
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.23), leaderCommit = 22
+2017/12/16 10:49:25 [0] append 1 log entries, last log (I.23)
+2017/12/16 10:49:25 [3] append 1 log entries, last log (I.23)
+2017/12/16 10:49:25 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:25 [4].nextIndex[0]: 23->24, .matchIndex[0]: 22->23
+2017/12/16 10:49:25 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:25 [4].nextIndex[3]: 23->24, .matchIndex[3]: 22->23
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [4] check committed logs after (I.22): logs until (I.23) is committed
+2017/12/16 10:49:25 [4]->[3] SEND heartbeat (T2), prevLog = (I.23,T2)
+2017/12/16 10:49:25 [4]->[0] SEND heartbeat (T2), prevLog = (I.23,T2)
+2017/12/16 10:49:25 APPLY: <I.23,T2,222> by Leader [4]
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.23), leaderCommit = 23
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.23), leaderCommit = 23
+2017/12/16 10:49:25 APPLY: <I.23,T2,222> by Follower [3]
+2017/12/16 10:49:25 APPLY: <I.23,T2,222> by Follower [0]
+2017/12/16 10:49:25 ================== COMMAND received from client: {223}
+2017/12/16 10:49:25 Leader [4] append new log entry: <I.24,T2,223>
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [4] check committed logs after (I.23): no more logs committed
+2017/12/16 10:49:25 [4]->[3] SEND nonempty heartbeat, prevLog = (I.23,T2), entries = (I.24)~(I.24), leaderCommit = 23
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.24), leaderCommit = 23
+2017/12/16 10:49:25 [4]->[0] SEND nonempty heartbeat, prevLog = (I.23,T2), entries = (I.24)~(I.24), leaderCommit = 23
+2017/12/16 10:49:25 [3] append 1 log entries, last log (I.24)
+2017/12/16 10:49:25 [0] append 1 log entries, last log (I.24)
+2017/12/16 10:49:25 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:25 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:25 [4].nextIndex[3]: 24->25, .matchIndex[3]: 23->24
+2017/12/16 10:49:25 [4].nextIndex[0]: 24->25, .matchIndex[0]: 23->24
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.24), leaderCommit = 23
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 Candidate [2] election timeout elapses
+2017/12/16 10:49:25 [2] Candidate->Candidate
+2017/12/16 10:49:25 [2] increase term: 10->11
+2017/12/16 10:49:25 [2]->[4] SEND RequestVote RPC (T11), lastLog = (I.51)(T1)
+2017/12/16 10:49:25 [2]->[1] SEND RequestVote RPC (T11), lastLog = (I.51)(T1)
+2017/12/16 10:49:25 [2]->[3] SEND RequestVote RPC (T11), lastLog = (I.51)(T1)
+2017/12/16 10:49:25 [2]->[0] SEND RequestVote RPC (T11), lastLog = (I.51)(T1)
+2017/12/16 10:49:25 [4] check committed logs after (I.23): logs until (I.24) is committed
+2017/12/16 10:49:25 [4]->[3] SEND heartbeat (T2), prevLog = (I.24,T2)
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.24), leaderCommit = 24
+2017/12/16 10:49:25 [4]->[0] SEND heartbeat (T2), prevLog = (I.24,T2)
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.24), leaderCommit = 24
+2017/12/16 10:49:25 APPLY: <I.24,T2,223> by Leader [4]
+2017/12/16 10:49:25 APPLY: <I.24,T2,223> by Follower [3]
+2017/12/16 10:49:25 APPLY: <I.24,T2,223> by Follower [0]
+2017/12/16 10:49:25 ================== COMMAND received from client: {224}
+2017/12/16 10:49:25 Leader [4] append new log entry: <I.25,T2,224>
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:25 [4] check committed logs after (I.24): no more logs committed
+2017/12/16 10:49:25 [4]->[3] SEND nonempty heartbeat, prevLog = (I.24,T2), entries = (I.25)~(I.25), leaderCommit = 24
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.25), leaderCommit = 24
+2017/12/16 10:49:25 [4]->[0] SEND nonempty heartbeat, prevLog = (I.24,T2), entries = (I.25)~(I.25), leaderCommit = 24
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.25), leaderCommit = 24
+2017/12/16 10:49:25 [3] append 1 log entries, last log (I.25)
+2017/12/16 10:49:25 [0] append 1 log entries, last log (I.25)
+2017/12/16 10:49:25 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:25 [4].nextIndex[3]: 25->26, .matchIndex[3]: 24->25
+2017/12/16 10:49:25 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:25 [4].nextIndex[0]: 25->26, .matchIndex[0]: 24->25
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [4] check committed logs after (I.24): logs until (I.25) is committed
+2017/12/16 10:49:25 [4]->[3] SEND heartbeat (T2), prevLog = (I.25,T2)
+2017/12/16 10:49:25 [4]->[0] SEND heartbeat (T2), prevLog = (I.25,T2)
+2017/12/16 10:49:25 APPLY: <I.25,T2,224> by Leader [4]
+2017/12/16 10:49:25 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.25), leaderCommit = 25
+2017/12/16 10:49:25 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.25), leaderCommit = 25
+2017/12/16 10:49:25 APPLY: <I.25,T2,224> by Follower [3]
+2017/12/16 10:49:25 APPLY: <I.25,T2,224> by Follower [0]
+2017/12/16 10:49:25 ================== COMMAND received from client: {225}
+2017/12/16 10:49:25 Leader [4] append new log entry: <I.26,T2,225>
+2017/12/16 10:49:25 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:25 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:25 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [4] check committed logs after (I.25): no more logs committed
+2017/12/16 10:49:26 [4]->[3] SEND nonempty heartbeat, prevLog = (I.25,T2), entries = (I.26)~(I.26), leaderCommit = 25
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.26), leaderCommit = 25
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.26), leaderCommit = 25
+2017/12/16 10:49:26 [4]->[0] SEND nonempty heartbeat, prevLog = (I.25,T2), entries = (I.26)~(I.26), leaderCommit = 25
+2017/12/16 10:49:26 [3] append 1 log entries, last log (I.26)
+2017/12/16 10:49:26 [0] append 1 log entries, last log (I.26)
+2017/12/16 10:49:26 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[3]: 26->27, .matchIndex[3]: 25->26
+2017/12/16 10:49:26 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[0]: 26->27, .matchIndex[0]: 25->26
+2017/12/16 10:49:26 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:26 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [4] check committed logs after (I.25): logs until (I.26) is committed
+2017/12/16 10:49:26 [4]->[3] SEND heartbeat (T2), prevLog = (I.26,T2)
+2017/12/16 10:49:26 [4]->[0] SEND heartbeat (T2), prevLog = (I.26,T2)
+2017/12/16 10:49:26 APPLY: <I.26,T2,225> by Leader [4]
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.26), leaderCommit = 26
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.26), leaderCommit = 26
+2017/12/16 10:49:26 APPLY: <I.26,T2,225> by Follower [0]
+2017/12/16 10:49:26 APPLY: <I.26,T2,225> by Follower [3]
+2017/12/16 10:49:26 ================== COMMAND received from client: {226}
+2017/12/16 10:49:26 Leader [4] append new log entry: <I.27,T2,226>
+2017/12/16 10:49:26 Candidate [2] election timeout elapses
+2017/12/16 10:49:26 [2] Candidate->Candidate
+2017/12/16 10:49:26 [2] increase term: 11->12
+2017/12/16 10:49:26 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:26 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [2]->[4] SEND RequestVote RPC (T12), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [2]->[0] SEND RequestVote RPC (T12), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [2]->[1] SEND RequestVote RPC (T12), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [2]->[3] SEND RequestVote RPC (T12), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [4] check committed logs after (I.26): no more logs committed
+2017/12/16 10:49:26 [4]->[3] SEND nonempty heartbeat, prevLog = (I.26,T2), entries = (I.27)~(I.27), leaderCommit = 26
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.27), leaderCommit = 26
+2017/12/16 10:49:26 [4]->[0] SEND nonempty heartbeat, prevLog = (I.26,T2), entries = (I.27)~(I.27), leaderCommit = 26
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.27), leaderCommit = 26
+2017/12/16 10:49:26 [3] append 1 log entries, last log (I.27)
+2017/12/16 10:49:26 [0] append 1 log entries, last log (I.27)
+2017/12/16 10:49:26 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[3]: 27->28, .matchIndex[3]: 26->27
+2017/12/16 10:49:26 [4].nextIndex[0]: 27->28, .matchIndex[0]: 26->27
+2017/12/16 10:49:26 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:26 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [4] check committed logs after (I.26): logs until (I.27) is committed
+2017/12/16 10:49:26 [4]->[3] SEND heartbeat (T2), prevLog = (I.27,T2)
+2017/12/16 10:49:26 [4]->[0] SEND heartbeat (T2), prevLog = (I.27,T2)
+2017/12/16 10:49:26 APPLY: <I.27,T2,226> by Leader [4]
+2017/12/16 10:49:26 APPLY: <I.27,T2,226> by Follower [0]
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.27), leaderCommit = 27
+2017/12/16 10:49:26 APPLY: <I.27,T2,226> by Follower [3]
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.27), leaderCommit = 27
+2017/12/16 10:49:26 ================== COMMAND received from client: {227}
+2017/12/16 10:49:26 Leader [4] append new log entry: <I.28,T2,227>
+2017/12/16 10:49:26 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:26 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [4] check committed logs after (I.27): no more logs committed
+2017/12/16 10:49:26 [4]->[3] SEND nonempty heartbeat, prevLog = (I.27,T2), entries = (I.28)~(I.28), leaderCommit = 27
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.28), leaderCommit = 27
+2017/12/16 10:49:26 [3] append 1 log entries, last log (I.28)
+2017/12/16 10:49:26 [4]->[0] SEND nonempty heartbeat, prevLog = (I.27,T2), entries = (I.28)~(I.28), leaderCommit = 27
+2017/12/16 10:49:26 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[3]: 28->29, .matchIndex[3]: 27->28
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.28), leaderCommit = 27
+2017/12/16 10:49:26 [0] append 1 log entries, last log (I.28)
+2017/12/16 10:49:26 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[0]: 28->29, .matchIndex[0]: 27->28
+2017/12/16 10:49:26 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:26 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [4] check committed logs after (I.27): logs until (I.28) is committed
+2017/12/16 10:49:26 [4]->[3] SEND heartbeat (T2), prevLog = (I.28,T2)
+2017/12/16 10:49:26 APPLY: <I.28,T2,227> by Leader [4]
+2017/12/16 10:49:26 [4]->[0] SEND heartbeat (T2), prevLog = (I.28,T2)
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.28), leaderCommit = 28
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.28), leaderCommit = 28
+2017/12/16 10:49:26 APPLY: <I.28,T2,227> by Follower [3]
+2017/12/16 10:49:26 APPLY: <I.28,T2,227> by Follower [0]
+2017/12/16 10:49:26 ================== COMMAND received from client: {228}
+2017/12/16 10:49:26 Leader [4] append new log entry: <I.29,T2,228>
+2017/12/16 10:49:26 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:26 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:26 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:26 [4] check committed logs after (I.28): no more logs committed
+2017/12/16 10:49:26 [4]->[3] SEND nonempty heartbeat, prevLog = (I.28,T2), entries = (I.29)~(I.29), leaderCommit = 28
+2017/12/16 10:49:26 [4]->[0] SEND nonempty heartbeat, prevLog = (I.28,T2), entries = (I.29)~(I.29), leaderCommit = 28
+2017/12/16 10:49:26 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.29), leaderCommit = 28
+2017/12/16 10:49:26 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.29), leaderCommit = 28
+2017/12/16 10:49:26 [3] append 1 log entries, last log (I.29)
+2017/12/16 10:49:26 [0] append 1 log entries, last log (I.29)
+2017/12/16 10:49:26 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[3]: 29->30, .matchIndex[3]: 28->29
+2017/12/16 10:49:26 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:26 [4].nextIndex[0]: 29->30, .matchIndex[0]: 28->29
+2017/12/16 10:49:26 Candidate [2] election timeout elapses
+2017/12/16 10:49:26 [2] Candidate->Candidate
+2017/12/16 10:49:26 [2] increase term: 12->13
+2017/12/16 10:49:26 [2]->[4] SEND RequestVote RPC (T13), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [2]->[1] SEND RequestVote RPC (T13), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [2]->[0] SEND RequestVote RPC (T13), lastLog = (I.51)(T1)
+2017/12/16 10:49:26 [2]->[3] SEND RequestVote RPC (T13), lastLog = (I.51)(T1)
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [4] check committed logs after (I.28): logs until (I.29) is committed
+2017/12/16 10:49:27 [4]->[3] SEND heartbeat (T2), prevLog = (I.29,T2)
+2017/12/16 10:49:27 [4]->[0] SEND heartbeat (T2), prevLog = (I.29,T2)
+2017/12/16 10:49:27 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.29), leaderCommit = 29
+2017/12/16 10:49:27 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.29), leaderCommit = 29
+2017/12/16 10:49:27 APPLY: <I.29,T2,228> by Leader [4]
+2017/12/16 10:49:27 APPLY: <I.29,T2,228> by Follower [0]
+2017/12/16 10:49:27 APPLY: <I.29,T2,228> by Follower [3]
+2017/12/16 10:49:27 ================== COMMAND received from client: {229}
+2017/12/16 10:49:27 Leader [4] append new log entry: <I.30,T2,229>
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [4] check committed logs after (I.29): no more logs committed
+2017/12/16 10:49:27 [4]->[3] SEND nonempty heartbeat, prevLog = (I.29,T2), entries = (I.30)~(I.30), leaderCommit = 29
+2017/12/16 10:49:27 [3] append 1 log entries, last log (I.30)
+2017/12/16 10:49:27 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:27 [4].nextIndex[3]: 30->31, .matchIndex[3]: 29->30
+2017/12/16 10:49:27 [4]->[0] SEND nonempty heartbeat, prevLog = (I.29,T2), entries = (I.30)~(I.30), leaderCommit = 29
+2017/12/16 10:49:27 [0] append 1 log entries, last log (I.30)
+2017/12/16 10:49:27 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.30), leaderCommit = 29
+2017/12/16 10:49:27 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.30), leaderCommit = 29
+2017/12/16 10:49:27 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:27 [4].nextIndex[0]: 30->31, .matchIndex[0]: 29->30
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [4] check committed logs after (I.29): logs until (I.30) is committed
+2017/12/16 10:49:27 [4]->[3] SEND heartbeat (T2), prevLog = (I.30,T2)
+2017/12/16 10:49:27 [4]->[0] SEND heartbeat (T2), prevLog = (I.30,T2)
+2017/12/16 10:49:27 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.30), leaderCommit = 30
+2017/12/16 10:49:27 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.30), leaderCommit = 30
+2017/12/16 10:49:27 APPLY: <I.30,T2,229> by Leader [4]
+2017/12/16 10:49:27 APPLY: <I.30,T2,229> by Follower [3]
+2017/12/16 10:49:27 APPLY: <I.30,T2,229> by Follower [0]
+2017/12/16 10:49:27 ================== COMMAND received from client: {230}
+2017/12/16 10:49:27 Leader [4] append new log entry: <I.31,T2,230>
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 Candidate [2] election timeout elapses
+2017/12/16 10:49:27 [2] Candidate->Candidate
+2017/12/16 10:49:27 [2] increase term: 13->14
+2017/12/16 10:49:27 [2]->[4] SEND RequestVote RPC (T14), lastLog = (I.51)(T1)
+2017/12/16 10:49:27 [2]->[1] SEND RequestVote RPC (T14), lastLog = (I.51)(T1)
+2017/12/16 10:49:27 [2]->[0] SEND RequestVote RPC (T14), lastLog = (I.51)(T1)
+2017/12/16 10:49:27 [2]->[3] SEND RequestVote RPC (T14), lastLog = (I.51)(T1)
+2017/12/16 10:49:27 [4] check committed logs after (I.30): no more logs committed
+2017/12/16 10:49:27 [4]->[3] SEND nonempty heartbeat, prevLog = (I.30,T2), entries = (I.31)~(I.31), leaderCommit = 30
+2017/12/16 10:49:27 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.31), leaderCommit = 30
+2017/12/16 10:49:27 [4]->[0] SEND nonempty heartbeat, prevLog = (I.30,T2), entries = (I.31)~(I.31), leaderCommit = 30
+2017/12/16 10:49:27 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.31), leaderCommit = 30
+2017/12/16 10:49:27 [3] append 1 log entries, last log (I.31)
+2017/12/16 10:49:27 [0] append 1 log entries, last log (I.31)
+2017/12/16 10:49:27 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:27 [4].nextIndex[3]: 31->32, .matchIndex[3]: 30->31
+2017/12/16 10:49:27 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:27 [4].nextIndex[0]: 31->32, .matchIndex[0]: 30->31
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [4] check committed logs after (I.30): logs until (I.31) is committed
+2017/12/16 10:49:27 [4]->[3] SEND heartbeat (T2), prevLog = (I.31,T2)
+2017/12/16 10:49:27 [4]->[0] SEND heartbeat (T2), prevLog = (I.31,T2)
+2017/12/16 10:49:27 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.31), leaderCommit = 31
+2017/12/16 10:49:27 APPLY: <I.31,T2,230> by Leader [4]
+2017/12/16 10:49:27 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.31), leaderCommit = 31
+2017/12/16 10:49:27 APPLY: <I.31,T2,230> by Follower [0]
+2017/12/16 10:49:27 APPLY: <I.31,T2,230> by Follower [3]
+2017/12/16 10:49:27 ================== COMMAND received from client: {231}
+2017/12/16 10:49:27 Leader [4] append new log entry: <I.32,T2,231>
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [4] check committed logs after (I.31): no more logs committed
+2017/12/16 10:49:27 [4]->[0] SEND nonempty heartbeat, prevLog = (I.31,T2), entries = (I.32)~(I.32), leaderCommit = 31
+2017/12/16 10:49:27 [0] append 1 log entries, last log (I.32)
+2017/12/16 10:49:27 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:27 [4].nextIndex[0]: 32->33, .matchIndex[0]: 31->32
+2017/12/16 10:49:27 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.32), leaderCommit = 31
+2017/12/16 10:49:27 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.32), leaderCommit = 31
+2017/12/16 10:49:27 [4]->[3] SEND nonempty heartbeat, prevLog = (I.31,T2), entries = (I.32)~(I.32), leaderCommit = 31
+2017/12/16 10:49:27 [3] append 1 log entries, last log (I.32)
+2017/12/16 10:49:27 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:27 [4].nextIndex[3]: 32->33, .matchIndex[3]: 31->32
+2017/12/16 10:49:27 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:27 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:27 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:27 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [4] check committed logs after (I.31): logs until (I.32) is committed
+2017/12/16 10:49:28 [4]->[3] SEND heartbeat (T2), prevLog = (I.32,T2)
+2017/12/16 10:49:28 [4]->[0] SEND heartbeat (T2), prevLog = (I.32,T2)
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.32), leaderCommit = 32
+2017/12/16 10:49:28 APPLY: <I.32,T2,231> by Leader [4]
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.32), leaderCommit = 32
+2017/12/16 10:49:28 APPLY: <I.32,T2,231> by Follower [0]
+2017/12/16 10:49:28 APPLY: <I.32,T2,231> by Follower [3]
+2017/12/16 10:49:28 ================== COMMAND received from client: {232}
+2017/12/16 10:49:28 Leader [4] append new log entry: <I.33,T2,232>
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [4] check committed logs after (I.32): no more logs committed
+2017/12/16 10:49:28 [4]->[3] SEND nonempty heartbeat, prevLog = (I.32,T2), entries = (I.33)~(I.33), leaderCommit = 32
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.33), leaderCommit = 32
+2017/12/16 10:49:28 [4]->[0] SEND nonempty heartbeat, prevLog = (I.32,T2), entries = (I.33)~(I.33), leaderCommit = 32
+2017/12/16 10:49:28 [3] append 1 log entries, last log (I.33)
+2017/12/16 10:49:28 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:28 [4].nextIndex[3]: 33->34, .matchIndex[3]: 32->33
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.33), leaderCommit = 32
+2017/12/16 10:49:28 [0] append 1 log entries, last log (I.33)
+2017/12/16 10:49:28 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:28 [4].nextIndex[0]: 33->34, .matchIndex[0]: 32->33
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 Candidate [2] election timeout elapses
+2017/12/16 10:49:28 [2] Candidate->Candidate
+2017/12/16 10:49:28 [2] increase term: 14->15
+2017/12/16 10:49:28 [2]->[4] SEND RequestVote RPC (T15), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [2]->[1] SEND RequestVote RPC (T15), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [2]->[3] SEND RequestVote RPC (T15), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [2]->[0] SEND RequestVote RPC (T15), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [4] check committed logs after (I.32): logs until (I.33) is committed
+2017/12/16 10:49:28 [4]->[3] SEND heartbeat (T2), prevLog = (I.33,T2)
+2017/12/16 10:49:28 APPLY: <I.33,T2,232> by Leader [4]
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.33), leaderCommit = 33
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.33), leaderCommit = 33
+2017/12/16 10:49:28 [4]->[0] SEND heartbeat (T2), prevLog = (I.33,T2)
+2017/12/16 10:49:28 APPLY: <I.33,T2,232> by Follower [3]
+2017/12/16 10:49:28 APPLY: <I.33,T2,232> by Follower [0]
+2017/12/16 10:49:28 ================== COMMAND received from client: {233}
+2017/12/16 10:49:28 Leader [4] append new log entry: <I.34,T2,233>
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [4] check committed logs after (I.33): no more logs committed
+2017/12/16 10:49:28 [4]->[3] SEND nonempty heartbeat, prevLog = (I.33,T2), entries = (I.34)~(I.34), leaderCommit = 33
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.34), leaderCommit = 33
+2017/12/16 10:49:28 [4]->[0] SEND nonempty heartbeat, prevLog = (I.33,T2), entries = (I.34)~(I.34), leaderCommit = 33
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.34), leaderCommit = 33
+2017/12/16 10:49:28 [3] append 1 log entries, last log (I.34)
+2017/12/16 10:49:28 [0] append 1 log entries, last log (I.34)
+2017/12/16 10:49:28 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:28 [4].nextIndex[3]: 34->35, .matchIndex[3]: 33->34
+2017/12/16 10:49:28 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:28 [4].nextIndex[0]: 34->35, .matchIndex[0]: 33->34
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [4] check committed logs after (I.33): logs until (I.34) is committed
+2017/12/16 10:49:28 [4]->[3] SEND heartbeat (T2), prevLog = (I.34,T2)
+2017/12/16 10:49:28 [4]->[0] SEND heartbeat (T2), prevLog = (I.34,T2)
+2017/12/16 10:49:28 APPLY: <I.34,T2,233> by Leader [4]
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.34), leaderCommit = 34
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.34), leaderCommit = 34
+2017/12/16 10:49:28 APPLY: <I.34,T2,233> by Follower [3]
+2017/12/16 10:49:28 APPLY: <I.34,T2,233> by Follower [0]
+2017/12/16 10:49:28 ================== COMMAND received from client: {234}
+2017/12/16 10:49:28 Leader [4] append new log entry: <I.35,T2,234>
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [4] check committed logs after (I.34): no more logs committed
+2017/12/16 10:49:28 [4]->[3] SEND nonempty heartbeat, prevLog = (I.34,T2), entries = (I.35)~(I.35), leaderCommit = 34
+2017/12/16 10:49:28 [4]->[0] SEND nonempty heartbeat, prevLog = (I.34,T2), entries = (I.35)~(I.35), leaderCommit = 34
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.35), leaderCommit = 34
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.35), leaderCommit = 34
+2017/12/16 10:49:28 [0] append 1 log entries, last log (I.35)
+2017/12/16 10:49:28 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:28 [4].nextIndex[0]: 35->36, .matchIndex[0]: 34->35
+2017/12/16 10:49:28 [3] append 1 log entries, last log (I.35)
+2017/12/16 10:49:28 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:28 [4].nextIndex[3]: 35->36, .matchIndex[3]: 34->35
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [4] check committed logs after (I.34): logs until (I.35) is committed
+2017/12/16 10:49:28 [4]->[3] SEND heartbeat (T2), prevLog = (I.35,T2)
+2017/12/16 10:49:28 APPLY: <I.35,T2,234> by Leader [4]
+2017/12/16 10:49:28 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.35), leaderCommit = 35
+2017/12/16 10:49:28 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.35), leaderCommit = 35
+2017/12/16 10:49:28 [4]->[0] SEND heartbeat (T2), prevLog = (I.35,T2)
+2017/12/16 10:49:28 APPLY: <I.35,T2,234> by Follower [3]
+2017/12/16 10:49:28 APPLY: <I.35,T2,234> by Follower [0]
+2017/12/16 10:49:28 ================== COMMAND received from client: {235}
+2017/12/16 10:49:28 Leader [4] append new log entry: <I.36,T2,235>
+2017/12/16 10:49:28 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:28 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:28 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:28 Candidate [2] election timeout elapses
+2017/12/16 10:49:28 [2] Candidate->Candidate
+2017/12/16 10:49:28 [2] increase term: 15->16
+2017/12/16 10:49:28 [2]->[4] SEND RequestVote RPC (T16), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [2]->[1] SEND RequestVote RPC (T16), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [2]->[0] SEND RequestVote RPC (T16), lastLog = (I.51)(T1)
+2017/12/16 10:49:28 [2]->[3] SEND RequestVote RPC (T16), lastLog = (I.51)(T1)
+2017/12/16 10:49:29 [4] check committed logs after (I.35): no more logs committed
+2017/12/16 10:49:29 [4]->[3] SEND nonempty heartbeat, prevLog = (I.35,T2), entries = (I.36)~(I.36), leaderCommit = 35
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.36), leaderCommit = 35
+2017/12/16 10:49:29 [4]->[0] SEND nonempty heartbeat, prevLog = (I.35,T2), entries = (I.36)~(I.36), leaderCommit = 35
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.36), leaderCommit = 35
+2017/12/16 10:49:29 [0] append 1 log entries, last log (I.36)
+2017/12/16 10:49:29 [3] append 1 log entries, last log (I.36)
+2017/12/16 10:49:29 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[0]: 36->37, .matchIndex[0]: 35->36
+2017/12/16 10:49:29 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[3]: 36->37, .matchIndex[3]: 35->36
+2017/12/16 10:49:29 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:29 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:29 [4] check committed logs after (I.35): logs until (I.36) is committed
+2017/12/16 10:49:29 [4]->[0] SEND heartbeat (T2), prevLog = (I.36,T2)
+2017/12/16 10:49:29 APPLY: <I.36,T2,235> by Leader [4]
+2017/12/16 10:49:29 APPLY: <I.36,T2,235> by Follower [0]
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.36), leaderCommit = 36
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.36), leaderCommit = 36
+2017/12/16 10:49:29 [4]->[3] SEND heartbeat (T2), prevLog = (I.36,T2)
+2017/12/16 10:49:29 APPLY: <I.36,T2,235> by Follower [3]
+2017/12/16 10:49:29 ================== COMMAND received from client: {236}
+2017/12/16 10:49:29 Leader [4] append new log entry: <I.37,T2,236>
+2017/12/16 10:49:29 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:29 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:29 [4] check committed logs after (I.36): no more logs committed
+2017/12/16 10:49:29 [4]->[3] SEND nonempty heartbeat, prevLog = (I.36,T2), entries = (I.37)~(I.37), leaderCommit = 36
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.37), leaderCommit = 36
+2017/12/16 10:49:29 [4]->[0] SEND nonempty heartbeat, prevLog = (I.36,T2), entries = (I.37)~(I.37), leaderCommit = 36
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.37), leaderCommit = 36
+2017/12/16 10:49:29 [0] append 1 log entries, last log (I.37)
+2017/12/16 10:49:29 [3] append 1 log entries, last log (I.37)
+2017/12/16 10:49:29 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[0]: 37->38, .matchIndex[0]: 36->37
+2017/12/16 10:49:29 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[3]: 37->38, .matchIndex[3]: 36->37
+2017/12/16 10:49:29 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:29 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:29 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [4] check committed logs after (I.36): logs until (I.37) is committed
+2017/12/16 10:49:29 [4]->[3] SEND heartbeat (T2), prevLog = (I.37,T2)
+2017/12/16 10:49:29 [4]->[0] SEND heartbeat (T2), prevLog = (I.37,T2)
+2017/12/16 10:49:29 APPLY: <I.37,T2,236> by Leader [4]
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.37), leaderCommit = 37
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.37), leaderCommit = 37
+2017/12/16 10:49:29 APPLY: <I.37,T2,236> by Follower [0]
+2017/12/16 10:49:29 APPLY: <I.37,T2,236> by Follower [3]
+2017/12/16 10:49:29 ================== COMMAND received from client: {237}
+2017/12/16 10:49:29 Leader [4] append new log entry: <I.38,T2,237>
+2017/12/16 10:49:29 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:29 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:29 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [4] check committed logs after (I.37): no more logs committed
+2017/12/16 10:49:29 [4]->[3] SEND nonempty heartbeat, prevLog = (I.37,T2), entries = (I.38)~(I.38), leaderCommit = 37
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.38), leaderCommit = 37
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.38), leaderCommit = 37
+2017/12/16 10:49:29 [4]->[0] SEND nonempty heartbeat, prevLog = (I.37,T2), entries = (I.38)~(I.38), leaderCommit = 37
+2017/12/16 10:49:29 [3] append 1 log entries, last log (I.38)
+2017/12/16 10:49:29 [0] append 1 log entries, last log (I.38)
+2017/12/16 10:49:29 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[0]: 38->39, .matchIndex[0]: 37->38
+2017/12/16 10:49:29 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[3]: 38->39, .matchIndex[3]: 37->38
+2017/12/16 10:49:29 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:29 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:29 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 Candidate [2] election timeout elapses
+2017/12/16 10:49:29 [2] Candidate->Candidate
+2017/12/16 10:49:29 [2] increase term: 16->17
+2017/12/16 10:49:29 [2]->[4] SEND RequestVote RPC (T17), lastLog = (I.51)(T1)
+2017/12/16 10:49:29 [2]->[0] SEND RequestVote RPC (T17), lastLog = (I.51)(T1)
+2017/12/16 10:49:29 [2]->[1] SEND RequestVote RPC (T17), lastLog = (I.51)(T1)
+2017/12/16 10:49:29 [2]->[3] SEND RequestVote RPC (T17), lastLog = (I.51)(T1)
+2017/12/16 10:49:29 [4] check committed logs after (I.37): logs until (I.38) is committed
+2017/12/16 10:49:29 [4]->[3] SEND heartbeat (T2), prevLog = (I.38,T2)
+2017/12/16 10:49:29 [4]->[0] SEND heartbeat (T2), prevLog = (I.38,T2)
+2017/12/16 10:49:29 APPLY: <I.38,T2,237> by Leader [4]
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.38), leaderCommit = 38
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.38), leaderCommit = 38
+2017/12/16 10:49:29 APPLY: <I.38,T2,237> by Follower [3]
+2017/12/16 10:49:29 APPLY: <I.38,T2,237> by Follower [0]
+2017/12/16 10:49:29 ================== COMMAND received from client: {238}
+2017/12/16 10:49:29 Leader [4] append new log entry: <I.39,T2,238>
+2017/12/16 10:49:29 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:29 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:29 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:29 [4] check committed logs after (I.38): no more logs committed
+2017/12/16 10:49:29 [4]->[3] SEND nonempty heartbeat, prevLog = (I.38,T2), entries = (I.39)~(I.39), leaderCommit = 38
+2017/12/16 10:49:29 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.39), leaderCommit = 38
+2017/12/16 10:49:29 [4]->[0] SEND nonempty heartbeat, prevLog = (I.38,T2), entries = (I.39)~(I.39), leaderCommit = 38
+2017/12/16 10:49:29 [3] append 1 log entries, last log (I.39)
+2017/12/16 10:49:29 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.39), leaderCommit = 38
+2017/12/16 10:49:29 [0] append 1 log entries, last log (I.39)
+2017/12/16 10:49:29 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[0]: 39->40, .matchIndex[0]: 38->39
+2017/12/16 10:49:29 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:29 [4].nextIndex[3]: 39->40, .matchIndex[3]: 38->39
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [4] check committed logs after (I.38): logs until (I.39) is committed
+2017/12/16 10:49:30 [4]->[3] SEND heartbeat (T2), prevLog = (I.39,T2)
+2017/12/16 10:49:30 APPLY: <I.39,T2,238> by Leader [4]
+2017/12/16 10:49:30 [4]->[0] SEND heartbeat (T2), prevLog = (I.39,T2)
+2017/12/16 10:49:30 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.39), leaderCommit = 39
+2017/12/16 10:49:30 APPLY: <I.39,T2,238> by Follower [0]
+2017/12/16 10:49:30 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.39), leaderCommit = 39
+2017/12/16 10:49:30 APPLY: <I.39,T2,238> by Follower [3]
+2017/12/16 10:49:30 ================== COMMAND received from client: {239}
+2017/12/16 10:49:30 Leader [4] append new log entry: <I.40,T2,239>
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [4] check committed logs after (I.39): no more logs committed
+2017/12/16 10:49:30 [4]->[3] SEND nonempty heartbeat, prevLog = (I.39,T2), entries = (I.40)~(I.40), leaderCommit = 39
+2017/12/16 10:49:30 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.40), leaderCommit = 39
+2017/12/16 10:49:30 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.40), leaderCommit = 39
+2017/12/16 10:49:30 [4]->[0] SEND nonempty heartbeat, prevLog = (I.39,T2), entries = (I.40)~(I.40), leaderCommit = 39
+2017/12/16 10:49:30 [3] append 1 log entries, last log (I.40)
+2017/12/16 10:49:30 [0] append 1 log entries, last log (I.40)
+2017/12/16 10:49:30 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:30 [4].nextIndex[3]: 40->41, .matchIndex[3]: 39->40
+2017/12/16 10:49:30 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:30 [4].nextIndex[0]: 40->41, .matchIndex[0]: 39->40
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [4] check committed logs after (I.39): logs until (I.40) is committed
+2017/12/16 10:49:30 [4]->[0] SEND heartbeat (T2), prevLog = (I.40,T2)
+2017/12/16 10:49:30 APPLY: <I.40,T2,239> by Leader [4]
+2017/12/16 10:49:30 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.40), leaderCommit = 40
+2017/12/16 10:49:30 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.40), leaderCommit = 40
+2017/12/16 10:49:30 [4]->[3] SEND heartbeat (T2), prevLog = (I.40,T2)
+2017/12/16 10:49:30 APPLY: <I.40,T2,239> by Follower [0]
+2017/12/16 10:49:30 APPLY: <I.40,T2,239> by Follower [3]
+2017/12/16 10:49:30 ================== COMMAND received from client: {240}
+2017/12/16 10:49:30 Leader [4] append new log entry: <I.41,T2,240>
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 Candidate [2] election timeout elapses
+2017/12/16 10:49:30 [2] Candidate->Candidate
+2017/12/16 10:49:30 [2] increase term: 17->18
+2017/12/16 10:49:30 [2]->[4] SEND RequestVote RPC (T18), lastLog = (I.51)(T1)
+2017/12/16 10:49:30 [2]->[1] SEND RequestVote RPC (T18), lastLog = (I.51)(T1)
+2017/12/16 10:49:30 [2]->[3] SEND RequestVote RPC (T18), lastLog = (I.51)(T1)
+2017/12/16 10:49:30 [2]->[0] SEND RequestVote RPC (T18), lastLog = (I.51)(T1)
+2017/12/16 10:49:30 [4] check committed logs after (I.40): no more logs committed
+2017/12/16 10:49:30 [4]->[3] SEND nonempty heartbeat, prevLog = (I.40,T2), entries = (I.41)~(I.41), leaderCommit = 40
+2017/12/16 10:49:30 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.41), leaderCommit = 40
+2017/12/16 10:49:30 [4]->[0] SEND nonempty heartbeat, prevLog = (I.40,T2), entries = (I.41)~(I.41), leaderCommit = 40
+2017/12/16 10:49:30 [3] append 1 log entries, last log (I.41)
+2017/12/16 10:49:30 [0] append 1 log entries, last log (I.41)
+2017/12/16 10:49:30 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:30 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:30 [4].nextIndex[3]: 41->42, .matchIndex[3]: 40->41
+2017/12/16 10:49:30 [4].nextIndex[0]: 41->42, .matchIndex[0]: 40->41
+2017/12/16 10:49:30 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.41), leaderCommit = 40
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [4] check committed logs after (I.40): logs until (I.41) is committed
+2017/12/16 10:49:30 [4]->[3] SEND heartbeat (T2), prevLog = (I.41,T2)
+2017/12/16 10:49:30 [4]->[0] SEND heartbeat (T2), prevLog = (I.41,T2)
+2017/12/16 10:49:30 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.41), leaderCommit = 41
+2017/12/16 10:49:30 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.41), leaderCommit = 41
+2017/12/16 10:49:30 APPLY: <I.41,T2,240> by Leader [4]
+2017/12/16 10:49:30 APPLY: <I.41,T2,240> by Follower [3]
+2017/12/16 10:49:30 APPLY: <I.41,T2,240> by Follower [0]
+2017/12/16 10:49:30 ================== COMMAND received from client: {241}
+2017/12/16 10:49:30 Leader [4] append new log entry: <I.42,T2,241>
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [4] check committed logs after (I.41): no more logs committed
+2017/12/16 10:49:30 [4]->[3] SEND nonempty heartbeat, prevLog = (I.41,T2), entries = (I.42)~(I.42), leaderCommit = 41
+2017/12/16 10:49:30 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.42), leaderCommit = 41
+2017/12/16 10:49:30 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.42), leaderCommit = 41
+2017/12/16 10:49:30 [4]->[0] SEND nonempty heartbeat, prevLog = (I.41,T2), entries = (I.42)~(I.42), leaderCommit = 41
+2017/12/16 10:49:30 [3] append 1 log entries, last log (I.42)
+2017/12/16 10:49:30 [0] append 1 log entries, last log (I.42)
+2017/12/16 10:49:30 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:30 [4].nextIndex[3]: 42->43, .matchIndex[3]: 41->42
+2017/12/16 10:49:30 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:30 [4].nextIndex[0]: 42->43, .matchIndex[0]: 41->42
+2017/12/16 10:49:30 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:30 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:30 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:30 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [4] check committed logs after (I.41): logs until (I.42) is committed
+2017/12/16 10:49:31 [4]->[3] SEND heartbeat (T2), prevLog = (I.42,T2)
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.42), leaderCommit = 42
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.42), leaderCommit = 42
+2017/12/16 10:49:31 APPLY: <I.42,T2,241> by Leader [4]
+2017/12/16 10:49:31 [4]->[0] SEND heartbeat (T2), prevLog = (I.42,T2)
+2017/12/16 10:49:31 APPLY: <I.42,T2,241> by Follower [3]
+2017/12/16 10:49:31 APPLY: <I.42,T2,241> by Follower [0]
+2017/12/16 10:49:31 ================== COMMAND received from client: {242}
+2017/12/16 10:49:31 Leader [4] append new log entry: <I.43,T2,242>
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [4] check committed logs after (I.42): no more logs committed
+2017/12/16 10:49:31 [4]->[3] SEND nonempty heartbeat, prevLog = (I.42,T2), entries = (I.43)~(I.43), leaderCommit = 42
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.43), leaderCommit = 42
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.43), leaderCommit = 42
+2017/12/16 10:49:31 [4]->[0] SEND nonempty heartbeat, prevLog = (I.42,T2), entries = (I.43)~(I.43), leaderCommit = 42
+2017/12/16 10:49:31 [0] append 1 log entries, last log (I.43)
+2017/12/16 10:49:31 [3] append 1 log entries, last log (I.43)
+2017/12/16 10:49:31 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:31 [4].nextIndex[0]: 43->44, .matchIndex[0]: 42->43
+2017/12/16 10:49:31 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:31 [4].nextIndex[3]: 43->44, .matchIndex[3]: 42->43
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 Candidate [2] election timeout elapses
+2017/12/16 10:49:31 [2] Candidate->Candidate
+2017/12/16 10:49:31 [2] increase term: 18->19
+2017/12/16 10:49:31 [2]->[4] SEND RequestVote RPC (T19), lastLog = (I.51)(T1)
+2017/12/16 10:49:31 [2]->[1] SEND RequestVote RPC (T19), lastLog = (I.51)(T1)
+2017/12/16 10:49:31 [2]->[0] SEND RequestVote RPC (T19), lastLog = (I.51)(T1)
+2017/12/16 10:49:31 [2]->[3] SEND RequestVote RPC (T19), lastLog = (I.51)(T1)
+2017/12/16 10:49:31 [4] check committed logs after (I.42): logs until (I.43) is committed
+2017/12/16 10:49:31 [4]->[3] SEND heartbeat (T2), prevLog = (I.43,T2)
+2017/12/16 10:49:31 [4]->[0] SEND heartbeat (T2), prevLog = (I.43,T2)
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.43), leaderCommit = 43
+2017/12/16 10:49:31 APPLY: <I.43,T2,242> by Leader [4]
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.43), leaderCommit = 43
+2017/12/16 10:49:31 APPLY: <I.43,T2,242> by Follower [3]
+2017/12/16 10:49:31 APPLY: <I.43,T2,242> by Follower [0]
+2017/12/16 10:49:31 ================== COMMAND received from client: {243}
+2017/12/16 10:49:31 Leader [4] append new log entry: <I.44,T2,243>
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [4] check committed logs after (I.43): no more logs committed
+2017/12/16 10:49:31 [4]->[3] SEND nonempty heartbeat, prevLog = (I.43,T2), entries = (I.44)~(I.44), leaderCommit = 43
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.44), leaderCommit = 43
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.44), leaderCommit = 43
+2017/12/16 10:49:31 [4]->[0] SEND nonempty heartbeat, prevLog = (I.43,T2), entries = (I.44)~(I.44), leaderCommit = 43
+2017/12/16 10:49:31 [3] append 1 log entries, last log (I.44)
+2017/12/16 10:49:31 [0] append 1 log entries, last log (I.44)
+2017/12/16 10:49:31 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:31 [4].nextIndex[0]: 44->45, .matchIndex[0]: 43->44
+2017/12/16 10:49:31 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:31 [4].nextIndex[3]: 44->45, .matchIndex[3]: 43->44
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [4] check committed logs after (I.43): logs until (I.44) is committed
+2017/12/16 10:49:31 [4]->[3] SEND heartbeat (T2), prevLog = (I.44,T2)
+2017/12/16 10:49:31 [4]->[0] SEND heartbeat (T2), prevLog = (I.44,T2)
+2017/12/16 10:49:31 APPLY: <I.44,T2,243> by Leader [4]
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.44), leaderCommit = 44
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.44), leaderCommit = 44
+2017/12/16 10:49:31 APPLY: <I.44,T2,243> by Follower [3]
+2017/12/16 10:49:31 APPLY: <I.44,T2,243> by Follower [0]
+2017/12/16 10:49:31 ================== COMMAND received from client: {244}
+2017/12/16 10:49:31 Leader [4] append new log entry: <I.45,T2,244>
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [4] check committed logs after (I.44): no more logs committed
+2017/12/16 10:49:31 [4]->[3] SEND nonempty heartbeat, prevLog = (I.44,T2), entries = (I.45)~(I.45), leaderCommit = 44
+2017/12/16 10:49:31 [4]->[0] SEND nonempty heartbeat, prevLog = (I.44,T2), entries = (I.45)~(I.45), leaderCommit = 44
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.45), leaderCommit = 44
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.45), leaderCommit = 44
+2017/12/16 10:49:31 [3] append 1 log entries, last log (I.45)
+2017/12/16 10:49:31 [0] append 1 log entries, last log (I.45)
+2017/12/16 10:49:31 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:31 [4].nextIndex[3]: 45->46, .matchIndex[3]: 44->45
+2017/12/16 10:49:31 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:31 [4].nextIndex[0]: 45->46, .matchIndex[0]: 44->45
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [4] check committed logs after (I.44): logs until (I.45) is committed
+2017/12/16 10:49:31 [4]->[3] SEND heartbeat (T2), prevLog = (I.45,T2)
+2017/12/16 10:49:31 [4]->[0] SEND heartbeat (T2), prevLog = (I.45,T2)
+2017/12/16 10:49:31 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.45), leaderCommit = 45
+2017/12/16 10:49:31 APPLY: <I.45,T2,244> by Leader [4]
+2017/12/16 10:49:31 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.45), leaderCommit = 45
+2017/12/16 10:49:31 APPLY: <I.45,T2,244> by Follower [0]
+2017/12/16 10:49:31 APPLY: <I.45,T2,244> by Follower [3]
+2017/12/16 10:49:31 ================== COMMAND received from client: {245}
+2017/12/16 10:49:31 Leader [4] append new log entry: <I.46,T2,245>
+2017/12/16 10:49:31 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:31 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:31 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:31 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 Candidate [2] election timeout elapses
+2017/12/16 10:49:32 [2] Candidate->Candidate
+2017/12/16 10:49:32 [2] increase term: 19->20
+2017/12/16 10:49:32 [2]->[4] SEND RequestVote RPC (T20), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [2]->[1] SEND RequestVote RPC (T20), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [2]->[3] SEND RequestVote RPC (T20), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [2]->[0] SEND RequestVote RPC (T20), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [4] check committed logs after (I.45): no more logs committed
+2017/12/16 10:49:32 [4]->[3] SEND nonempty heartbeat, prevLog = (I.45,T2), entries = (I.46)~(I.46), leaderCommit = 45
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.46), leaderCommit = 45
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.46), leaderCommit = 45
+2017/12/16 10:49:32 [4]->[0] SEND nonempty heartbeat, prevLog = (I.45,T2), entries = (I.46)~(I.46), leaderCommit = 45
+2017/12/16 10:49:32 [3] append 1 log entries, last log (I.46)
+2017/12/16 10:49:32 [0] append 1 log entries, last log (I.46)
+2017/12/16 10:49:32 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[0]: 46->47, .matchIndex[0]: 45->46
+2017/12/16 10:49:32 [4].nextIndex[3]: 46->47, .matchIndex[3]: 45->46
+2017/12/16 10:49:32 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:32 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:32 [4] check committed logs after (I.45): logs until (I.46) is committed
+2017/12/16 10:49:32 [4]->[3] SEND heartbeat (T2), prevLog = (I.46,T2)
+2017/12/16 10:49:32 APPLY: <I.46,T2,245> by Leader [4]
+2017/12/16 10:49:32 [4]->[0] SEND heartbeat (T2), prevLog = (I.46,T2)
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.46), leaderCommit = 46
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.46), leaderCommit = 46
+2017/12/16 10:49:32 APPLY: <I.46,T2,245> by Follower [0]
+2017/12/16 10:49:32 APPLY: <I.46,T2,245> by Follower [3]
+2017/12/16 10:49:32 ================== COMMAND received from client: {246}
+2017/12/16 10:49:32 Leader [4] append new log entry: <I.47,T2,246>
+2017/12/16 10:49:32 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:32 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:32 [4] check committed logs after (I.46): no more logs committed
+2017/12/16 10:49:32 [4]->[3] SEND nonempty heartbeat, prevLog = (I.46,T2), entries = (I.47)~(I.47), leaderCommit = 46
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.47), leaderCommit = 46
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.47), leaderCommit = 46
+2017/12/16 10:49:32 [4]->[0] SEND nonempty heartbeat, prevLog = (I.46,T2), entries = (I.47)~(I.47), leaderCommit = 46
+2017/12/16 10:49:32 [0] append 1 log entries, last log (I.47)
+2017/12/16 10:49:32 [3] append 1 log entries, last log (I.47)
+2017/12/16 10:49:32 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[0]: 47->48, .matchIndex[0]: 46->47
+2017/12/16 10:49:32 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[3]: 47->48, .matchIndex[3]: 46->47
+2017/12/16 10:49:32 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:32 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:32 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [4] check committed logs after (I.46): logs until (I.47) is committed
+2017/12/16 10:49:32 [4]->[3] SEND heartbeat (T2), prevLog = (I.47,T2)
+2017/12/16 10:49:32 [4]->[0] SEND heartbeat (T2), prevLog = (I.47,T2)
+2017/12/16 10:49:32 APPLY: <I.47,T2,246> by Leader [4]
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.47), leaderCommit = 47
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.47), leaderCommit = 47
+2017/12/16 10:49:32 APPLY: <I.47,T2,246> by Follower [3]
+2017/12/16 10:49:32 APPLY: <I.47,T2,246> by Follower [0]
+2017/12/16 10:49:32 ================== COMMAND received from client: {247}
+2017/12/16 10:49:32 Leader [4] append new log entry: <I.48,T2,247>
+2017/12/16 10:49:32 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:32 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:32 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [4] check committed logs after (I.47): no more logs committed
+2017/12/16 10:49:32 [4]->[3] SEND nonempty heartbeat, prevLog = (I.47,T2), entries = (I.48)~(I.48), leaderCommit = 47
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.48), leaderCommit = 47
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.48), leaderCommit = 47
+2017/12/16 10:49:32 [4]->[0] SEND nonempty heartbeat, prevLog = (I.47,T2), entries = (I.48)~(I.48), leaderCommit = 47
+2017/12/16 10:49:32 [3] append 1 log entries, last log (I.48)
+2017/12/16 10:49:32 [0] append 1 log entries, last log (I.48)
+2017/12/16 10:49:32 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[3]: 48->49, .matchIndex[3]: 47->48
+2017/12/16 10:49:32 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[0]: 48->49, .matchIndex[0]: 47->48
+2017/12/16 10:49:32 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:32 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:32 Candidate [2] election timeout elapses
+2017/12/16 10:49:32 [2] Candidate->Candidate
+2017/12/16 10:49:32 [2] increase term: 20->21
+2017/12/16 10:49:32 [2]->[4] SEND RequestVote RPC (T21), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [2]->[1] SEND RequestVote RPC (T21), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [2]->[3] SEND RequestVote RPC (T21), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [2]->[0] SEND RequestVote RPC (T21), lastLog = (I.51)(T1)
+2017/12/16 10:49:32 [4] check committed logs after (I.47): logs until (I.48) is committed
+2017/12/16 10:49:32 [4]->[3] SEND heartbeat (T2), prevLog = (I.48,T2)
+2017/12/16 10:49:32 [4]->[0] SEND heartbeat (T2), prevLog = (I.48,T2)
+2017/12/16 10:49:32 APPLY: <I.48,T2,247> by Leader [4]
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.48), leaderCommit = 48
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.48), leaderCommit = 48
+2017/12/16 10:49:32 APPLY: <I.48,T2,247> by Follower [0]
+2017/12/16 10:49:32 APPLY: <I.48,T2,247> by Follower [3]
+2017/12/16 10:49:32 ================== COMMAND received from client: {248}
+2017/12/16 10:49:32 Leader [4] append new log entry: <I.49,T2,248>
+2017/12/16 10:49:32 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:32 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:32 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:32 [4] check committed logs after (I.48): no more logs committed
+2017/12/16 10:49:32 [4]->[3] SEND nonempty heartbeat, prevLog = (I.48,T2), entries = (I.49)~(I.49), leaderCommit = 48
+2017/12/16 10:49:32 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.49), leaderCommit = 48
+2017/12/16 10:49:32 [4]->[0] SEND nonempty heartbeat, prevLog = (I.48,T2), entries = (I.49)~(I.49), leaderCommit = 48
+2017/12/16 10:49:32 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.49), leaderCommit = 48
+2017/12/16 10:49:32 [0] append 1 log entries, last log (I.49)
+2017/12/16 10:49:32 [3] append 1 log entries, last log (I.49)
+2017/12/16 10:49:32 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[0]: 49->50, .matchIndex[0]: 48->49
+2017/12/16 10:49:32 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:32 [4].nextIndex[3]: 49->50, .matchIndex[3]: 48->49
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [4] check committed logs after (I.48): logs until (I.49) is committed
+2017/12/16 10:49:33 [4]->[3] SEND heartbeat (T2), prevLog = (I.49,T2)
+2017/12/16 10:49:33 [4]->[0] SEND heartbeat (T2), prevLog = (I.49,T2)
+2017/12/16 10:49:33 APPLY: <I.49,T2,248> by Leader [4]
+2017/12/16 10:49:33 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.49), leaderCommit = 49
+2017/12/16 10:49:33 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.49), leaderCommit = 49
+2017/12/16 10:49:33 APPLY: <I.49,T2,248> by Follower [3]
+2017/12/16 10:49:33 APPLY: <I.49,T2,248> by Follower [0]
+2017/12/16 10:49:33 ================== COMMAND received from client: {249}
+2017/12/16 10:49:33 Leader [4] append new log entry: <I.50,T2,249>
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [4] check committed logs after (I.49): no more logs committed
+2017/12/16 10:49:33 [4]->[3] SEND nonempty heartbeat, prevLog = (I.49,T2), entries = (I.50)~(I.50), leaderCommit = 49
+2017/12/16 10:49:33 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.50), leaderCommit = 49
+2017/12/16 10:49:33 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.50), leaderCommit = 49
+2017/12/16 10:49:33 [4]->[0] SEND nonempty heartbeat, prevLog = (I.49,T2), entries = (I.50)~(I.50), leaderCommit = 49
+2017/12/16 10:49:33 [3] append 1 log entries, last log (I.50)
+2017/12/16 10:49:33 [0] append 1 log entries, last log (I.50)
+2017/12/16 10:49:33 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:33 [4].nextIndex[3]: 50->51, .matchIndex[3]: 49->50
+2017/12/16 10:49:33 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:33 [4].nextIndex[0]: 50->51, .matchIndex[0]: 49->50
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [4] check committed logs after (I.49): logs until (I.50) is committed
+2017/12/16 10:49:33 [4]->[3] SEND heartbeat (T2), prevLog = (I.50,T2)
+2017/12/16 10:49:33 [4]->[0] SEND heartbeat (T2), prevLog = (I.50,T2)
+2017/12/16 10:49:33 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.50), leaderCommit = 50
+2017/12/16 10:49:33 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.50), leaderCommit = 50
+2017/12/16 10:49:33 APPLY: <I.50,T2,249> by Leader [4]
+2017/12/16 10:49:33 APPLY: <I.50,T2,249> by Follower [3]
+2017/12/16 10:49:33 APPLY: <I.50,T2,249> by Follower [0]
+2017/12/16 10:49:33 ================== COMMAND received from client: {250}
+2017/12/16 10:49:33 Leader [4] append new log entry: <I.51,T2,250>
+2017/12/16 10:49:33 Candidate [2] election timeout elapses
+2017/12/16 10:49:33 [2] Candidate->Candidate
+2017/12/16 10:49:33 [2] increase term: 21->22
+2017/12/16 10:49:33 [2]->[4] SEND RequestVote RPC (T22), lastLog = (I.51)(T1)
+2017/12/16 10:49:33 [2]->[1] SEND RequestVote RPC (T22), lastLog = (I.51)(T1)
+2017/12/16 10:49:33 [2]->[3] SEND RequestVote RPC (T22), lastLog = (I.51)(T1)
+2017/12/16 10:49:33 [2]->[0] SEND RequestVote RPC (T22), lastLog = (I.51)(T1)
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [4] check committed logs after (I.50): no more logs committed
+2017/12/16 10:49:33 [4]->[3] SEND nonempty heartbeat, prevLog = (I.50,T2), entries = (I.51)~(I.51), leaderCommit = 50
+2017/12/16 10:49:33 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 50
+2017/12/16 10:49:33 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 50
+2017/12/16 10:49:33 [4]->[0] SEND nonempty heartbeat, prevLog = (I.50,T2), entries = (I.51)~(I.51), leaderCommit = 50
+2017/12/16 10:49:33 [0] append 1 log entries, last log (I.51)
+2017/12/16 10:49:33 [3] append 1 log entries, last log (I.51)
+2017/12/16 10:49:33 [4]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:33 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:33 [4].nextIndex[3]: 51->52, .matchIndex[3]: 50->51
+2017/12/16 10:49:33 [4].nextIndex[0]: 51->52, .matchIndex[0]: 50->51
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [4] check committed logs after (I.50): logs until (I.51) is committed
+2017/12/16 10:49:33 [4]->[3] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:33 [4]->[0] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:33 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:33 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:33 APPLY: <I.51,T2,250> by Leader [4]
+2017/12/16 10:49:33 APPLY: <I.51,T2,250> by Follower [3]
+2017/12/16 10:49:33 APPLY: <I.51,T2,250> by Follower [0]
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:33 [4]->[3] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:33 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:33 [4]->[0] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:33 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:33 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:33 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:33 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:33 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[3] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:34 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[3] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND heartbeat (T2), prevLog = (I.51,T2)
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 51
+2017/12/16 10:49:34 Candidate [2] election timeout elapses
+2017/12/16 10:49:34 [2] Candidate->Candidate
+2017/12/16 10:49:34 [2] increase term: 22->23
+2017/12/16 10:49:34 [2]->[4] SEND RequestVote RPC (T23), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [2]->[1] SEND RequestVote RPC (T23), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [2]->[3] SEND RequestVote RPC (T23), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [2]->[0] SEND RequestVote RPC (T23), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:34 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+Test: disconnect [3]
+2017/12/16 10:49:34 ================== COMMAND received from client: {301}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.52,T2,301>
+2017/12/16 10:49:34 ================== COMMAND received from client: {302}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.53,T2,302>
+2017/12/16 10:49:34 ================== COMMAND received from client: {303}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.54,T2,303>
+2017/12/16 10:49:34 ================== COMMAND received from client: {304}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.55,T2,304>
+2017/12/16 10:49:34 ================== COMMAND received from client: {305}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.56,T2,305>
+2017/12/16 10:49:34 ================== COMMAND received from client: {306}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.57,T2,306>
+2017/12/16 10:49:34 ================== COMMAND received from client: {307}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.58,T2,307>
+2017/12/16 10:49:34 ================== COMMAND received from client: {308}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.59,T2,308>
+2017/12/16 10:49:34 ================== COMMAND received from client: {309}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.60,T2,309>
+2017/12/16 10:49:34 ================== COMMAND received from client: {310}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.61,T2,310>
+2017/12/16 10:49:34 ================== COMMAND received from client: {311}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.62,T2,311>
+2017/12/16 10:49:34 ================== COMMAND received from client: {312}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.63,T2,312>
+2017/12/16 10:49:34 ================== COMMAND received from client: {313}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.64,T2,313>
+2017/12/16 10:49:34 ================== COMMAND received from client: {314}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.65,T2,314>
+2017/12/16 10:49:34 ================== COMMAND received from client: {315}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.66,T2,315>
+2017/12/16 10:49:34 ================== COMMAND received from client: {316}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.67,T2,316>
+2017/12/16 10:49:34 ================== COMMAND received from client: {317}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.68,T2,317>
+2017/12/16 10:49:34 ================== COMMAND received from client: {318}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.69,T2,318>
+2017/12/16 10:49:34 ================== COMMAND received from client: {319}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.70,T2,319>
+2017/12/16 10:49:34 ================== COMMAND received from client: {320}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.71,T2,320>
+2017/12/16 10:49:34 ================== COMMAND received from client: {321}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.72,T2,321>
+2017/12/16 10:49:34 ================== COMMAND received from client: {322}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.73,T2,322>
+2017/12/16 10:49:34 ================== COMMAND received from client: {323}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.74,T2,323>
+2017/12/16 10:49:34 ================== COMMAND received from client: {324}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.75,T2,324>
+2017/12/16 10:49:34 ================== COMMAND received from client: {325}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.76,T2,325>
+2017/12/16 10:49:34 ================== COMMAND received from client: {326}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.77,T2,326>
+2017/12/16 10:49:34 ================== COMMAND received from client: {327}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.78,T2,327>
+2017/12/16 10:49:34 ================== COMMAND received from client: {328}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.79,T2,328>
+2017/12/16 10:49:34 ================== COMMAND received from client: {329}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.80,T2,329>
+2017/12/16 10:49:34 ================== COMMAND received from client: {330}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.81,T2,330>
+2017/12/16 10:49:34 ================== COMMAND received from client: {331}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.82,T2,331>
+2017/12/16 10:49:34 ================== COMMAND received from client: {332}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.83,T2,332>
+2017/12/16 10:49:34 ================== COMMAND received from client: {333}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.84,T2,333>
+2017/12/16 10:49:34 ================== COMMAND received from client: {334}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.85,T2,334>
+2017/12/16 10:49:34 ================== COMMAND received from client: {335}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.86,T2,335>
+2017/12/16 10:49:34 ================== COMMAND received from client: {336}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.87,T2,336>
+2017/12/16 10:49:34 ================== COMMAND received from client: {337}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.88,T2,337>
+2017/12/16 10:49:34 ================== COMMAND received from client: {338}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.89,T2,338>
+2017/12/16 10:49:34 ================== COMMAND received from client: {339}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.90,T2,339>
+2017/12/16 10:49:34 ================== COMMAND received from client: {340}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.91,T2,340>
+2017/12/16 10:49:34 ================== COMMAND received from client: {341}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.92,T2,341>
+2017/12/16 10:49:34 ================== COMMAND received from client: {342}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.93,T2,342>
+2017/12/16 10:49:34 ================== COMMAND received from client: {343}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.94,T2,343>
+2017/12/16 10:49:34 ================== COMMAND received from client: {344}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.95,T2,344>
+2017/12/16 10:49:34 ================== COMMAND received from client: {345}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.96,T2,345>
+2017/12/16 10:49:34 ================== COMMAND received from client: {346}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.97,T2,346>
+2017/12/16 10:49:34 ================== COMMAND received from client: {347}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.98,T2,347>
+2017/12/16 10:49:34 ================== COMMAND received from client: {348}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.99,T2,348>
+2017/12/16 10:49:34 ================== COMMAND received from client: {349}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.100,T2,349>
+2017/12/16 10:49:34 ================== COMMAND received from client: {350}
+2017/12/16 10:49:34 Leader [4] append new log entry: <I.101,T2,350>
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [0] append 50 log entries, last log (I.101)
+2017/12/16 10:49:34 [4]<-[0] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:34 [4].nextIndex[0]: 52->102, .matchIndex[0]: 51->101
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:34 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:34 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND heartbeat (T1), prevLog = (I.51,T1)
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.51), leaderCommit = 1
+Test: disconnect all servers
+Test: [1], [2] and [3] reconnected
+2017/12/16 10:49:34 ================== COMMAND received from client: {401}
+2017/12/16 10:49:34 Leader [1] append new log entry: <I.52,T1,401>
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 Candidate [2] election timeout elapses
+2017/12/16 10:49:34 [2] Candidate->Candidate
+2017/12/16 10:49:34 [2] increase term: 23->24
+2017/12/16 10:49:34 [2]->[1] SEND RequestVote RPC (T24), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [2]->[3] SEND RequestVote RPC (T24), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [2]->[0] SEND RequestVote RPC (T24), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [2]->[4] SEND RequestVote RPC (T24), lastLog = (I.51)(T1)
+2017/12/16 10:49:34 [3] updates its term to (T24) according to [2]
+2017/12/16 10:49:34 No vote: [3]'s log is more up-to-date than candidate [2]
+2017/12/16 10:49:34 [1] updates its term to (T24) according to [2]
+2017/12/16 10:49:34 No vote: [1]'s log is more up-to-date than candidate [2]
+2017/12/16 10:49:34 [2]<-[3] RECEIVE RequestVote RPC Reply, voteGranted = false
+2017/12/16 10:49:34 [2]<-[1] RECEIVE RequestVote RPC Reply, voteGranted = false
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[3] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND nonempty heartbeat, prevLog = (I.51,T1), entries = (I.52)~(I.52), leaderCommit = 1
+2017/12/16 10:49:34 [2] append 1 log entries, last log (I.52)
+2017/12/16 10:49:34 Candidate [2] received heartbeat from new leader
+2017/12/16 10:49:34 [2] Candidate->Follower
+2017/12/16 10:49:34 [3] append 51 log entries, last log (I.52)
+2017/12/16 10:49:34 [1]<-[2] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:34 [1].nextIndex[2]: 52->53, .matchIndex[2]: 51->52
+2017/12/16 10:49:34 [1]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:34 [1].nextIndex[3]: 2->53, .matchIndex[3]: 1->52
+2017/12/16 10:49:34 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:34 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:34 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:34 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:34 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:34 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:34 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:34 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:35 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:35 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 Follower [0] election timeout expired
+2017/12/16 10:49:35 [0] Follower->Candidate
+2017/12/16 10:49:35 [0] increase term: 2->3
+2017/12/16 10:49:35 [0]->[4] SEND RequestVote RPC (T3), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [0]->[2] SEND RequestVote RPC (T3), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [0]->[3] SEND RequestVote RPC (T3), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [0]->[1] SEND RequestVote RPC (T3), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:35 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:35 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:35 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:35 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:35 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:35 Candidate [0] election timeout elapses
+2017/12/16 10:49:35 [0] Candidate->Candidate
+2017/12/16 10:49:35 [0] increase term: 3->4
+2017/12/16 10:49:35 [0]->[4] SEND RequestVote RPC (T4), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [0]->[2] SEND RequestVote RPC (T4), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [0]->[3] SEND RequestVote RPC (T4), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [0]->[1] SEND RequestVote RPC (T4), lastLog = (I.101)(T2)
+2017/12/16 10:49:35 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:35 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:35 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:35 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:36 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:36 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:36 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:36 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:36 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:36 Candidate [0] election timeout elapses
+2017/12/16 10:49:36 [0] Candidate->Candidate
+2017/12/16 10:49:36 [0] increase term: 4->5
+2017/12/16 10:49:36 [0]->[4] SEND RequestVote RPC (T5), lastLog = (I.101)(T2)
+2017/12/16 10:49:36 [0]->[2] SEND RequestVote RPC (T5), lastLog = (I.101)(T2)
+2017/12/16 10:49:36 [0]->[3] SEND RequestVote RPC (T5), lastLog = (I.101)(T2)
+2017/12/16 10:49:36 [0]->[1] SEND RequestVote RPC (T5), lastLog = (I.101)(T2)
+2017/12/16 10:49:36 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:36 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:36 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[2] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[3] SEND heartbeat (T24), prevLog = (I.52,T1)
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.52), leaderCommit = 1
+2017/12/16 10:49:36 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:36 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:36 ================== COMMAND received from client: {401}
+2017/12/16 10:49:36 Leader [1] append new log entry: <I.53,T24,401>
+2017/12/16 10:49:36 [1] check committed logs after (I.1): no more logs committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.53), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[2] SEND nonempty heartbeat, prevLog = (I.52,T1), entries = (I.53)~(I.53), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.53), leaderCommit = 1
+2017/12/16 10:49:36 [1]->[3] SEND nonempty heartbeat, prevLog = (I.52,T1), entries = (I.53)~(I.53), leaderCommit = 1
+2017/12/16 10:49:36 [2] append 1 log entries, last log (I.53)
+2017/12/16 10:49:36 [3] append 1 log entries, last log (I.53)
+2017/12/16 10:49:36 [1]<-[2] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:36 [1].nextIndex[2]: 53->54, .matchIndex[2]: 52->53
+2017/12/16 10:49:36 [1]<-[3] RECEIVE nonempty heartbeat reply, success = true
+2017/12/16 10:49:36 [1].nextIndex[3]: 53->54, .matchIndex[3]: 52->53
+2017/12/16 10:49:36 [4] check committed logs after (I.51): no more logs committed
+2017/12/16 10:49:36 [4]->[3] SEND nonempty heartbeat, prevLog = (I.51,T2), entries = (I.52)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[2] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [4]->[0] SEND heartbeat (T2), prevLog = (I.101,T2)
+2017/12/16 10:49:36 [4]->[1] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.101), leaderCommit = 51
+2017/12/16 10:49:36 [1] check committed logs after (I.1): logs until (I.53) is committed
+2017/12/16 10:49:36 [1]->[4] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.53), leaderCommit = 53
+2017/12/16 10:49:36 [1]->[0] SEND nonempty heartbeat, prevLog = (I.1,T1), entries = (I.2)~(I.53), leaderCommit = 53
+2017/12/16 10:49:36 [1]->[3] SEND heartbeat (T24), prevLog = (I.53,T24)
+2017/12/16 10:49:36 [1]->[2] SEND heartbeat (T24), prevLog = (I.53,T24)
+2017/12/16 10:49:36 APPLY: <I.2,T1,101> by Leader [1]
+2017/12/16 10:49:36 APPLY: <I.3,T1,102> by Leader [1]
+2017/12/16 10:49:36 apply error: commit index=2 server=1 101 != server=4 201
+exit status 1
+FAIL	github.com/nettee/raftgo/src/raft	20.113s
