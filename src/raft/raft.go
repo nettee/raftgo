@@ -211,7 +211,7 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// If a server receives a request with a stale term number, it rejects the request.
 	// (Figure2) 1. Reply false if term < currentTerm
 	if rf.currentTerm > args.Term {
-		log.Printf("[%d] rejected [%d]", rf.me, args.CandidateId)
+		DPrintf("[%d] rejected [%d]", rf.me, args.CandidateId)
 		reply.VoteGranted = false
 		return
 	}
@@ -220,7 +220,7 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term to (T%d) according to [%d], when handling RequestVote RPC", rf.me, rf.currentTerm, args.CandidateId)
+		DPrintf("[%d] updates its term to (T%d) according to [%d], when handling RequestVote RPC", rf.me, rf.currentTerm, args.CandidateId)
 		rf.roleTransition(Follower)
 	}
 
@@ -228,7 +228,7 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 	// log is at least as up-to-date as receiver's log, grant vote
 
 	if rf.votedFor != -1 && rf.votedFor != args.CandidateId {
-		log.Printf("No vote: [%d] already voted another server", rf.me)
+		DPrintf("No vote: [%d] already voted another server", rf.me)
 		reply.VoteGranted = false
 		return
 	}
@@ -249,13 +249,13 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 		upToDate = args.LastLogIndex >= rf.getLastLogEntry().Index
 	}
 	if !upToDate {
-		log.Printf("No vote: [%d]'s log is more up-to-date than candidate [%d]", rf.me, args.CandidateId)
+		DPrintf("No vote: [%d]'s log is more up-to-date than candidate [%d]", rf.me, args.CandidateId)
 		return
 	}
 
 	// Grant vote
 	rf.votedFor = args.CandidateId
-	log.Printf("[%d] votes for [%d]", rf.me, args.CandidateId)
+	DPrintf("[%d] votes for [%d]", rf.me, args.CandidateId)
 	reply.VoteGranted = true
 	rf.grantingVote <- true
 }
@@ -278,12 +278,12 @@ func (rf *Raft) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) {
 // the struct itself.
 //
 func (rf *Raft) sendRequestVote(server int, args RequestVoteArgs, reply *RequestVoteReply) bool {
-	log.Printf("[%d]->[%d] SEND RequestVote RPC (T%d), lastLog = (I.%d)(T%d)",
+	DPrintf("[%d]->[%d] SEND RequestVote RPC (T%d), lastLog = (I.%d)(T%d)",
 		rf.me, server, rf.currentTerm,
 			args.LastLogIndex, args.LastLogTerm)
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
 	if ok {
-		log.Printf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, server, reply.VoteGranted)
+		DPrintf("[%d]<-[%d] RECEIVE RequestVote RPC Reply, voteGranted = %v", rf.me, server, reply.VoteGranted)
 	}
 	return ok
 }
@@ -301,7 +301,7 @@ func (rf *Raft) sendRequestVoteRPC(i int) {
 
 		if reply.Term > rf.currentTerm {
 			rf.currentTerm = reply.Term
-			log.Printf("[%d] updates its term to (T%d) according to [%d], after receiving RequestVote RPC reply",
+			DPrintf("[%d] updates its term to (T%d) according to [%d], after receiving RequestVote RPC reply",
 				rf.me, rf.currentTerm, i)
 			rf.roleTransition(Follower)
 			rf.persist()
@@ -334,7 +334,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// If a server receives a request with a stale term number, it rejects the request.
 	// (Figure2) 1. Reply false if term < currentTerm.
 	if rf.currentTerm > args.Term {
-		log.Printf("[%d] rejected [%d]", rf.me, args.LeaderId)
+		DPrintf("[%d] rejected [%d]", rf.me, args.LeaderId)
 		reply.Success = false
 		reply.NextIndex = rf.getLastLogEntry().Index + 1
 		return
@@ -344,7 +344,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// it updates its current term to the larger value.
 	if rf.currentTerm < args.Term {
 		rf.currentTerm = args.Term
-		log.Printf("[%d] updates its term to (T%d) according to [%d], when handling heartbeat", rf.me, rf.currentTerm, args.LeaderId)
+		DPrintf("[%d] updates its term to (T%d) according to [%d], when handling heartbeat", rf.me, rf.currentTerm, args.LeaderId)
 		rf.roleTransition(Follower)
 	}
 
@@ -353,13 +353,13 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// (Figure2) 2. Reply false if log doesn't contain any entry
 	// at prevLogIndex whose term matches prevLogTerm.
 	if args.PrevLogIndex > rf.getLastLogEntry().Index {
-		log.Printf("No append: [%d] has no log of index (I.%d)", rf.me, args.PrevLogIndex)
+		DPrintf("No append: [%d] has no log of index (I.%d)", rf.me, args.PrevLogIndex)
 		reply.Success = false
 		reply.NextIndex = rf.getLastLogEntry().Index + 1
 		return
 	}
 	if le := rf.log[args.PrevLogIndex]; le.Term != args.PrevLogTerm {
-		log.Printf("No append: [%d]'s log (I.%d,T%d) does not match prevLog = (I.%d,T%d)",
+		DPrintf("No append: [%d]'s log (I.%d,T%d) does not match prevLog = (I.%d,T%d)",
 			rf.me, le.Index, le.Term, args.PrevLogIndex, args.PrevLogTerm)
 		reply.Success = false
 		nextIndex := args.PrevLogIndex
@@ -381,7 +381,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 	// (Figure2) 4. Append any new entries not already in the log.
 	rf.log = append(rf.log, args.Entries...) // `...' means appending all entries
 	if len(args.Entries) > 0 {
-		log.Printf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
+		DPrintf("[%d] append %d log entries, last log (I.%d)", rf.me, len(args.Entries), rf.getLastLogEntry().Index)
 	}
 	reply.Success = true
 	reply.NextIndex = rf.getLastLogEntry().Index + 1
@@ -403,10 +403,10 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 func (rf *Raft) sendAppendEntries(server int, args AppendEntriesArgs, reply *AppendEntriesReply) bool {
 	isEmptyHeartbeat := args.Entries == nil || len(args.Entries) == 0
 	if isEmptyHeartbeat {
-		log.Printf("[%d]->[%d] SEND heartbeat (T%d), prevLog = (I.%d,T%d)",
+		DPrintf("[%d]->[%d] SEND heartbeat (T%d), prevLog = (I.%d,T%d)",
 			rf.me, server, args.Term, args.PrevLogIndex, args.PrevLogTerm)
 	} else {
-		log.Printf("[%d]->[%d] SEND nonempty heartbeat, prevLog = (I.%d,T%d), entries = (I.%d)~(I.%d), leaderCommit = %d",
+		DPrintf("[%d]->[%d] SEND nonempty heartbeat, prevLog = (I.%d,T%d), entries = (I.%d)~(I.%d), leaderCommit = %d",
 			rf.me, server, args.PrevLogIndex, args.PrevLogTerm,
 				args.Entries[0].Index, args.Entries[len(args.Entries)-1].Index,
 					args.LeaderCommit)
@@ -440,12 +440,12 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 	isEmptyHeartbeat := len(args.Entries) == 0
 	if ok {
 		if !isEmptyHeartbeat {
-			log.Printf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, i, reply.Success)
+			DPrintf("[%d]<-[%d] RECEIVE nonempty heartbeat reply, success = %v", rf.me, i, reply.Success)
 		}
 
 		if reply.Term > rf.currentTerm {
 			rf.currentTerm = reply.Term
-			log.Printf("[%d] updates its term to (T%d) according to [%d], after receiving heartbeat reply", rf.me, rf.currentTerm, i)
+			DPrintf("[%d] updates its term to (T%d) according to [%d], after receiving heartbeat reply", rf.me, rf.currentTerm, i)
 			rf.roleTransition(Follower)
 			rf.persist()
 			return
@@ -459,7 +459,7 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 				// The next log entry to send to that server: a brand new entry.
 				rf.matchIndex[i] = args.Entries[len(args.Entries)-1].Index
 				rf.nextIndex[i] = rf.matchIndex[i] + 1
-				log.Printf("[%d].nextIndex[%d]: %d->%d, .matchIndex[%d]: %d->%d",
+				DPrintf("[%d].nextIndex[%d]: %d->%d, .matchIndex[%d]: %d->%d",
 					rf.me, i, lastNextIndex, rf.nextIndex[i],
 					i, lastMatchIndex, rf.matchIndex[i])
 			}
@@ -469,7 +469,7 @@ func (rf *Raft) sendAppendEntriesRPC(i int) {
 			// and prevLogTerm.
 			// (S5.3) The leader decrements nextIndex and retries AppendEntries RPC.
 			rf.nextIndex[i] = reply.NextIndex
-			log.Printf("[%d].nextIndex[%d] decrements to %d", rf.me, i, rf.nextIndex[i])
+			DPrintf("[%d].nextIndex[%d] decrements to %d", rf.me, i, rf.nextIndex[i])
 		}
 	}
 }
@@ -493,12 +493,12 @@ func (rf *Raft) checkCommitted() {
 		}
 	}
 	if committedIndex > rf.commitIndex {
-		log.Printf("[%d] check committed logs after (I.%d): logs until (I.%d) is committed",
+		DPrintf("[%d] check committed logs after (I.%d): logs until (I.%d) is committed",
 			rf.me, rf.commitIndex, committedIndex)
 		rf.commitIndex = committedIndex
 		rf.applyLogs()
 	} else {
-		log.Printf("[%d] check committed logs after (I.%d): no more logs committed",
+		DPrintf("[%d] check committed logs after (I.%d): no more logs committed",
 			rf.me, rf.commitIndex)
 	}
 }
@@ -511,7 +511,7 @@ func (rf *Raft) applyLogs() {
 
 func (rf *Raft) apply(les ...LogEntry) {
 	for _, le := range les {
-		log.Printf("APPLY: %s by %s [%d]", le.String(), rf.role, rf.me)
+		DPrintf("APPLY: %s by %s [%d]", le.String(), rf.role, rf.me)
 		rf.applyCh <- ApplyMsg{Index: le.Index, Command: le.Command}
 	}
 }
@@ -533,7 +533,7 @@ func (rf *Raft) electionTimeout() time.Duration {
 	rand.Seed(int64(rf.me + time.Now().Nanosecond()))
 	// Election timeout: 500~800ms
 	timeout := 500 + rand.Intn(300)
-	//log.Printf("[%d]'s election timeout = %d ms", rf.me, timeout)
+	//DPrintf("[%d]'s election timeout = %d ms", rf.me, timeout)
 	return time.Duration(timeout) * time.Millisecond
 }
 
@@ -545,7 +545,7 @@ func (rf *Raft) increaseTerm() {
 
 	oldTerm := rf.currentTerm
 	rf.currentTerm++
-	log.Printf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
+	DPrintf("[%d] increase term: %d->%d", rf.me, oldTerm, rf.currentTerm)
 	rf.persist()
 }
 
@@ -553,7 +553,7 @@ func (rf *Raft) roleTransition(newRole Role) {
 
 	oldRole := rf.role
 	rf.role = newRole
-	log.Printf("[%d] %s->%s", rf.me, oldRole, newRole)
+	DPrintf("[%d] %s->%s", rf.me, oldRole, newRole)
 
 	if oldRole == Candidate {
 		rf.winsElection = false // Reset variable
@@ -587,11 +587,11 @@ func (rf *Raft) runAsFollower() {
 
 	select {
 	case <- rf.receivedHeartbeat:
-		//log.Printf("Follower [%d] received heartbeat, remains follower", rf.me)
+		//DPrintf("Follower [%d] received heartbeat, remains follower", rf.me)
 	case <- rf.grantingVote:
-		log.Printf("Follower [%d] is granting vote, remains follower", rf.me)
+		DPrintf("Follower [%d] is granting vote, remains follower", rf.me)
 	case <- timeout:
-		log.Printf("Follower [%d] election timeout expired", rf.me)
+		DPrintf("Follower [%d] election timeout expired", rf.me)
 		// (S5.2-P1) If a follower receives no communication over election timeout,
 		// then is begins an election to choose a new leader.
 		// (S5.2-P2) To begin an election, a follower increments its current term
@@ -641,16 +641,16 @@ func (rf *Raft) runAsCandidate() {
 
 	select {
 	case <- rf.majorityVotes:
-		log.Printf("Candidate [%d] wins an election", rf.me)
+		DPrintf("Candidate [%d] wins an election", rf.me)
 		rf.roleTransition(Leader)
 		rf.initializeLeaderStates()
 		return
 	case <- rf.receivedHeartbeat:
-		log.Printf("Candidate [%d] received heartbeat from new leader", rf.me)
+		DPrintf("Candidate [%d] received heartbeat from new leader", rf.me)
 		rf.roleTransition(Follower)
 		return
 	case <- timeout:
-		log.Printf("Candidate [%d] election timeout elapses", rf.me)
+		DPrintf("Candidate [%d] election timeout elapses", rf.me)
 		// Start new election
 		rf.roleTransition(Candidate)
 		return
@@ -681,7 +681,7 @@ func (rf *Raft) runAsLeader() {
 
 	select {
 	case <- rf.receivedHeartbeat:
-		log.Printf("Leader [%d] received heartbeat from new leader", rf.me)
+		DPrintf("Leader [%d] received heartbeat from new leader", rf.me)
 		rf.roleTransition(Follower)
 	case <- timeout:
 		return
@@ -755,7 +755,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// (S5.2-P1) When servers start up, they begin as followers.
 	rf.role = Follower
-	log.Printf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
+	DPrintf("[%d] :%s, term = %d", rf.me, rf.role, rf.currentTerm)
 	rf.dead = make(chan bool, len(rf.peers))
 
 	// Persistent states on all servers
@@ -809,7 +809,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		// If command received from client: append entry to log,
 		// respond after entry applied to state machine.
 
-		log.Printf("[%d] ================== COMMAND received from client: {%d}", rf.me, command)
+		DPrintf("[%d] ================== COMMAND received from client: {%d}", rf.me, command)
 
 		index = rf.getLastLogEntry().Index + 1
 
@@ -817,7 +817,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		rf.log = append(rf.log, logEntry)
 		rf.persist()
 
-		log.Printf("Leader [%d] append new log entry: %s", rf.me, logEntry.String())
+		DPrintf("Leader [%d] append new log entry: %s", rf.me, logEntry.String())
 	}
 
 	return index, term, isLeader
@@ -832,7 +832,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 func (rf *Raft) Kill() {
 	// Your code here, if desired.
 
-	log.Printf("Kill [%d]", rf.me)
+	DPrintf("Kill [%d]", rf.me)
 	rf.role = Dead
 	rf.dead <- true
 }
