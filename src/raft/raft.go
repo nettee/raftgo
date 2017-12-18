@@ -363,7 +363,7 @@ func (rf *Raft) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply)
 			rf.me, le.Index, le.Term, args.PrevLogIndex, args.PrevLogTerm)
 		reply.Success = false
 		nextIndex := args.PrevLogIndex
-		// TODO how to calculate reply.NextIndex
+		
 		for i := args.PrevLogIndex - 1; i >= 0; i-- {
 			if rf.log[i].Term != le.Term {
 				nextIndex = i + 1
